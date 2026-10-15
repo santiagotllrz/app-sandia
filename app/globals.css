@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* Tokens de color: solo blanco, negro y grises neutros. Se cambian aquí y todo el portal los toma.
+   El "acento" es un gris medio: se usa para el hover de titulares y los detalles de énfasis. */
+:root {
+  --bg-base: #fafafa;
+  --bg-raised: #ffffff;
+  --bg-subtle: rgb(0 0 0 / 0.035);
+  --bg-soft: rgb(0 0 0 / 0.06);
+  --bg-inverse: #171717;
+  --fg-primary: #171717;
+  --fg-secondary: rgb(23 23 23 / 0.64);
+  --fg-tertiary: rgb(23 23 23 / 0.48);
+  --border-soft: rgb(0 0 0 / 0.08);
+  --border-base: rgb(0 0 0 / 0.15);
+  --accent: #5c5c5c;
+  --accent-soft: rgb(0 0 0 / 0.06);
+  --positivo: #262626;
+  --negativo: #737373;
+  --shadow-hover: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px -6px rgb(0 0 0 / 0.12);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #121212;
+    --bg-raised: #1b1b1b;
+    --bg-subtle: rgb(255 255 255 / 0.035);
+    --bg-soft: rgb(255 255 255 / 0.07);
+    --bg-inverse: #ededed;
+    --fg-primary: #ededed;
+    --fg-secondary: rgb(237 237 237 / 0.64);
+    --fg-tertiary: rgb(237 237 237 / 0.46);
+    --border-soft: rgb(255 255 255 / 0.08);
+    --border-base: rgb(255 255 255 / 0.15);
+    --accent: #b3b3b3;
+    --accent-soft: rgb(255 255 255 / 0.08);
+    --positivo: #e5e5e5;
+    --negativo: #8a8a8a;
+    --shadow-hover: 0 0 0 1px rgb(255 255 255 / 0.06), 0 8px 24px -8px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-base: var(--bg-base);
+  --color-raised: var(--bg-raised);
+  --color-subtle: var(--bg-subtle);
+  --color-soft: var(--bg-soft);
+  --color-inverse: var(--bg-inverse);
+  --color-primary: var(--fg-primary);
+  --color-secondary: var(--fg-secondary);
+  --color-tertiary: var(--fg-tertiary);
+  --color-borde: var(--border-soft);
+  --color-borde-fuerte: var(--border-base);
+  --color-acento: var(--accent);
+  --color-acento-suave: var(--accent-soft);
+  --color-positivo: var(--positivo);
+  --color-negativo: var(--negativo);
+  --font-sans: var(--fuente-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-editorial: var(--fuente-editorial), ui-serif, Georgia, Cambria, serif;
+  --shadow-hover: var(--shadow-hover);
+}
+
+html {
+  background: var(--bg-base);
+  color: var(--fg-primary);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg-base);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--fg-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.font-editorial {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.22;
+  text-wrap: pretty;
+}
+
+/* Cuerpo de la noticia */
+.cuerpo-noticia p {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  margin-block: 0 1.15em;
+  text-wrap: pretty;
+}
+.cuerpo-noticia h2 {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin-block: 2em 0.6em;
+  text-wrap: balance;
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

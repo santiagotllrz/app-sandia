@@ -1,0 +1,71 @@
+{
+  "evento": {
+    "id": "evt_7f3c1a9e2b4d4c0e",
+    "tipo": "noticia.publicada",
+    "creado_at": "2026-10-15T13:00:00Z",
+    "version_esquema": "1"
+  },
+  "empresa": {
+    "id": "7a775bdf-50e0-4467-ace4-20f4ef444f44",
+    "slug": "agro",
+    "nombre": "Índice Agro"
+  },
+  "noticia": {
+    "id": "f29b92e1-5a85-4417-b613-c2656d883c3f",
+    "version": 1,
+    "slug": "gobierno-fija-31-de-diciembre-medidas-apagon-el-nino",
+    "idioma": "es-CO",
+    "titular": "Gobierno de De la Espriella fija el 31 de diciembre para activar medidas contra un apagón por El Niño y pide $1,2 billones",
+    "resumen": "El Gobierno puso el 31 de diciembre como fecha límite para las medidas de choque contra un apagón y pidió al Congreso $1,2 billones.",
+    "nicho": { "slug": "politica-y-mercado", "nombre": "Política y mercado" },
+    "etiquetas": ["el niño colombia", "apagón eléctrico", "generación térmica", "embalses"],
+    "entrada": {
+      "parrafos": [
+        "El presidente de Colombia, Abelardo de la Espriella, anunció el lunes 12 de octubre de 2026, en una alocución televisada, que su Gobierno puso el 31 de diciembre como fecha límite para tener en marcha las medidas de choque contra un eventual apagón eléctrico. Según La FM y El Colombiano, el mandatario ordenó crear un equipo especial con responsables y tareas concretas, y pidió al Congreso, con mensaje de urgencia, un traslado presupuestal de $1,2 billones (pesos colombianos) dentro de la adición al Presupuesto General de 2026.",
+        "El anuncio llega cinco días después de que el Instituto de Hidrología, Meteorología y Estudios Ambientales (Ideam) declarara oficialmente la llegada de El Niño, el 8 de octubre. Según el Ideam, citado por Portafolio, existe una probabilidad de 83 % de que el fenómeno se prolongue al menos hasta marzo de 2027."
+      ],
+      "fuentes": ["f2", "f3", "f4", "f5"]
+    },
+    "secciones": [
+      {
+        "subtitulo": "Tres frentes de acción y un equipo con fecha de cierre",
+        "parrafos": [
+          "De la Espriella afirmó en la alocución: \"Ya ordené constituir un grupo, un equipo especial con responsables, con tareas identificadas y además concretas, y con una fecha límite el 31 de diciembre\". Según el mandatario, antes de ese día deberán estar en marcha las medidas para reforzar la generación térmica, administrar los embalses y proteger el servicio de energía, según informaron Portafolio y El Colombiano."
+        ],
+        "fuentes": ["f2", "f4"]
+      },
+      {
+        "subtitulo": "Lo que aún no está claro",
+        "parrafos": [
+          "El Gobierno no ha publicado la lista de las medidas concretas ni los nombres de los responsables del equipo especial."
+        ],
+        "fuentes": ["f3", "f4"]
+      }
+    ],
+    "cuerpo_html": "<p>El presidente de Colombia, Abelardo de la Espriella, anunció el lunes 12 de octubre de 2026...</p><h2>Tres frentes de acción y un equipo con fecha de cierre</h2><p>De la Espriella afirmó en la alocución...</p>",
+    "imagen": {
+      "url": "https://iddjepduokjysnibjjqy.supabase.co/storage/v1/object/public/carousels/redaccion/7a775bdf-50e0-4467-ace4-20f4ef444f44/f29b92e1-5a85-4417-b613-c2656d883c3f.jpg",
+      "ancho": 1600,
+      "alto": 900,
+      "alt": "Redes de energía eléctrica en Colombia",
+      "credito": {
+        "texto": "Foto: Primicias",
+        "medio": "Primicias",
+        "autor": null,
+        "url_origen": "https://www.primicias.ec/internacional/colombia-medidas-cortes-luz-apagon-electrico-fenomeno-nino-espriella-134926/"
+      }
+    },
+    "fuentes": [
+      { "id": "f1", "medio": "Primicias", "titulo": "Colombia busca 'medidas de choque' hasta el 31 de diciembre para evitar 'apagón eléctrico' en medio de El Niño", "url": "https://www.primicias.ec/internacional/colombia-medidas-cortes-luz-apagon-electrico-fenomeno-nino-espriella-134926/", "fecha": "2026-10-14T15:53:17-05:00", "tipo": "medio", "principal": false },
+      { "id": "f2", "medio": "Portafolio", "titulo": "Gobierno pone fecha límite para evitar un apagón en Colombia: medidas deberán estar listas en diciembre", "url": "https://www.portafolio.co/economia/gobierno/gobierno-pone-fecha-limite-para-evitar-un-apagon-en-colombia-medidas-deberan-estar-listas-en-diciembre-504352", "fecha": "2026-10-13T12:07:27Z", "tipo": "medio", "principal": false },
+      { "id": "f3", "medio": "El Universal", "titulo": "Fenómeno El Niño: De la Espriella fija fecha límite para evitar un apagón", "url": "https://www.eluniversal.com.co/colombia/2026/10/13/fenomeno-el-nino-de-la-espriella-fija-fecha-limite-para-evitar-un-apagon/", "fecha": "2026-10-13T15:30:43Z", "tipo": "medio", "principal": false },
+      { "id": "f4", "medio": "El Colombiano", "titulo": "Gobierno pide $1,2 billones para evitar apagón por El Niño y fija plazo para tomar medidas hasta el 31 de diciembre", "url": "https://www.elcolombiano.com/negocios/gobierno-pide-12-billones-evitar-apagon-el-nino-colombia-AP42188190", "fecha": "2026-10-13T12:44:41Z", "tipo": "medio", "principal": true },
+      { "id": "f5", "medio": "La FM", "titulo": "Gobierno De la Espriella fija plazo para medidas por fenómeno de El Niño", "url": "https://www.lafm.com.co/politica/gobierno-abelardo-de-la-espriella-fija-plazo-plan-de-choque-fenomeno-de-el-nino-413754", "fecha": "2026-10-13T01:44:15Z", "tipo": "medio", "principal": false }
+    ],
+    "palabras": 999,
+    "minutos_lectura": 5,
+    "redactada_at": "2026-10-15T03:43:46Z",
+    "publicada_at": "2026-10-15T13:00:00Z",
+    "url_original": "https://www.primicias.ec/internacional/colombia-medidas-cortes-luz-apagon-electrico-fenomeno-nino-espriella-134926/"
+  }
+}

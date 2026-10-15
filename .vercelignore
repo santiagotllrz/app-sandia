@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+.vercel
+.env
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.data
+# Material de referencia (página guardada de Perplexity), no se despliega
+Perplexity Discover.html
+Perplexity Discover_files/
+.claude/settings.local.json
