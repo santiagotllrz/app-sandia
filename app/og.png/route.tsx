@@ -9,8 +9,8 @@ const size = { width: 1200, height: 630 }
 
 // Imagen para compartir del sitio y los listados (cada noticia usa su propia foto).
 export async function GET() {
-  const logo = await readFile(path.join(process.cwd(), "public", "logo.png"))
-  const src = `data:image/png;base64,${logo.toString("base64")}`
+  const logo = await readFile(path.join(process.cwd(), "public", "logo.svg"))
+  const src = `data:image/svg+xml;base64,${logo.toString("base64")}`
   return new ImageResponse(
     (
       <div

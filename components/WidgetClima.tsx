@@ -35,6 +35,8 @@ export function WidgetClima() {
   const [unidad, setUnidad] = useState<"C" | "F">("C")
 
   useEffect(() => {
+    // La columna lateral solo se muestra en escritorio: en móvil no se pide el clima.
+    if (!matchMedia("(min-width: 860px)").matches) return
     try {
       if (localStorage.getItem(CLAVE_UNIDAD) === "F") setUnidad("F")
     } catch {}

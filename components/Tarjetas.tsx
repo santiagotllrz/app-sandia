@@ -41,7 +41,7 @@ export function TarjetaGrande({
               <FechaRelativa iso={n.publicada_at} className="truncate" />
             </div>
           </div>
-          {n.resumen && <p className="line-clamp-6 text-base leading-relaxed text-primary">{n.resumen}</p>}
+          {n.resumen && <p className="text-base leading-relaxed text-primary">{n.resumen}</p>}
           <div className="flex-1" />
           <PilaFuentes dominios={n.fuentes_dominios} total={n.fuentes_total} />
         </div>

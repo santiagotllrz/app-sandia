@@ -1,9 +1,8 @@
-import Image from "next/image"
 import Link from "next/link"
-import logo from "@/public/logo.png"
 import { rutas, sitio } from "@/lib/config"
 import type { Tema } from "@/lib/tipos"
 import { IconoRss } from "./Iconos"
+import { Logo } from "./Logo"
 
 export function PiePagina({ temas }: { temas: Tema[] }) {
   return (
@@ -11,7 +10,7 @@ export function PiePagina({ temas }: { temas: Tema[] }) {
       <div className="mx-auto grid max-w-[1240px] gap-8 px-4 py-10 md:grid-cols-[1fr_2fr] md:px-8">
         <div className="flex flex-col gap-3">
           <Link href="/" className="w-fit" aria-label={`${sitio.nombre}, inicio`}>
-            <Image src={logo} alt={sitio.nombre} className="h-8 w-auto dark:invert" />
+            <Logo className="h-8" />
           </Link>
           <p className="max-w-xs text-sm text-secondary">{sitio.descripcion}</p>
           <a href="/rss.xml" className="inline-flex w-fit items-center gap-1.5 text-sm text-secondary hover:text-primary">
