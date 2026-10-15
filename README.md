@@ -6,7 +6,7 @@ Next.js 16 (App Router) + Supabase, desplegado en Vercel. Las noticias no se esc
 
 1. **Base de datos**: ejecuta `supabase/migrations/20261015000000_portal_noticias.sql` en el proyecto de Supabase (SQL Editor, o `supabase db push`). Crea las tablas `temas` (con los 10 nichos de Agro), `noticias`, `noticia_vistas_diarias`, `webhook_eventos`, sus funciones y el bucket público `noticias` para las imágenes.
 2. **Variables de entorno** (en Vercel → Settings → Environment Variables; ver `.env.example`):
-   - `NEXT_PUBLIC_SITE_URL`: dominio final, sin barra al final.
+   - `NEXT_PUBLIC_SITE_URL` (opcional): por defecto `https://app.usesandia.com`.
    - `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`: solo servidor.
    - `HANCEL_WEBHOOK_SECRET`: se copia desde Conexiones en el motor.
    - `GOOGLE_SITE_VERIFICATION` / `BING_SITE_VERIFICATION` (opcional).

@@ -6,10 +6,18 @@ export const sitio = {
   idioma: "es-CO",
   locale: "es_CO",
   pais: "CO",
-  url: (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, ""),
+  // Dominio público. Canonical, sitemaps, RSS y JSON-LD usan siempre este, aunque la página se abra
+  // desde un dominio *.vercel.app. NEXT_PUBLIC_SITE_URL solo hace falta para cambiarlo.
+  url: (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.NODE_ENV === "production" ? "https://app.usesandia.com" : "http://localhost:3000")
+  ).replace(/\/$/, ""),
   // Ubicación por defecto del widget de clima cuando no se conoce la del visitante.
   climaPorDefecto: { ciudad: "Bogotá", lat: 4.711, lon: -74.0721 },
 }
+
+/** Solo el despliegue de producción se indexa; las vistas previas de Vercel quedan fuera de Google. */
+export const indexable = !process.env.VERCEL_ENV || process.env.VERCEL_ENV === "production"
 
 export const POR_PAGINA = 19 // 1 tarjeta grande + 3 pequeñas, repetido; cierra con una grande
 

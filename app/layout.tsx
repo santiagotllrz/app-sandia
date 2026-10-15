@@ -4,7 +4,7 @@ import { Encabezado } from "@/components/Encabezado"
 import { JsonLd } from "@/components/JsonLd"
 import { PiePagina } from "@/components/PiePagina"
 import { almacen } from "@/lib/almacen"
-import { sitio } from "@/lib/config"
+import { indexable, sitio } from "@/lib/config"
 import { IMAGEN_OG, jsonLdOrganizacion, jsonLdSitio } from "@/lib/seo"
 import type { Tema } from "@/lib/tipos"
 import "./globals.css"
@@ -24,11 +24,13 @@ export const metadata: Metadata = {
   },
   openGraph: { type: "website", siteName: sitio.nombre, locale: sitio.locale, url: "/", images: [IMAGEN_OG] },
   twitter: { card: "summary_large_image", images: [IMAGEN_OG.url] },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
-  },
+  robots: indexable
+    ? {
+        index: true,
+        follow: true,
+        googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+      }
+    : { index: false, follow: false },
   formatDetection: { telephone: false, address: false, email: false },
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
