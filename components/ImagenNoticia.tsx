@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { LogoMarca } from "./Logo"
 
 export function ImagenNoticia({
   src,
@@ -25,11 +24,7 @@ export function ImagenNoticia({
           priority={prioridad}
           className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
         />
-      ) : (
-        <div className="absolute inset-0 grid place-items-center text-tertiary">
-          <LogoMarca className="size-10 opacity-40" />
-        </div>
-      )}
+      ) : null}
     </div>
   )
 }

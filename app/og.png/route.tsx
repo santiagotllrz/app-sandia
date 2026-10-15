@@ -1,5 +1,6 @@
+import { readFile } from "node:fs/promises"
+import path from "node:path"
 import { ImageResponse } from "next/og"
-import { MarcaOg } from "@/components/MarcaOg"
 import { sitio } from "@/lib/config"
 
 export const dynamic = "force-static"
@@ -7,7 +8,9 @@ export const dynamic = "force-static"
 const size = { width: 1200, height: 630 }
 
 // Imagen para compartir del sitio y los listados (cada noticia usa su propia foto).
-export function GET() {
+export async function GET() {
+  const logo = await readFile(path.join(process.cwd(), "public", "logo.png"))
+  const src = `data:image/png;base64,${logo.toString("base64")}`
   return new ImageResponse(
     (
       <div
@@ -19,13 +22,10 @@ export function GET() {
           justifyContent: "space-between",
           padding: 80,
           background: "#fafafa",
-          color: "#171717",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <MarcaOg tam={96} />
-          <div style={{ fontSize: 56, fontWeight: 700 }}>{sitio.nombre}</div>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} width={434} height={141} alt="" />
         <div style={{ fontSize: 44, lineHeight: 1.25, maxWidth: 980, color: "rgba(23,23,23,.64)" }}>{sitio.descripcion}</div>
       </div>
     ),
