@@ -8,7 +8,7 @@ import { ImagenNoticia } from "./ImagenNoticia"
 
 type Nivel = "h2" | "h3"
 
-/** Tarjeta grande: texto a la izquierda, foto a la derecha (o al revés), con resumen. */
+/** Tarjeta grande: texto a la izquierda, foto a la derecha (o al revés). */
 export function TarjetaGrande({
   noticia: n,
   prioridad = false,
@@ -41,7 +41,6 @@ export function TarjetaGrande({
               <FechaRelativa iso={n.publicada_at} className="truncate" />
             </div>
           </div>
-          {n.resumen && <p className="text-base leading-relaxed text-primary">{n.resumen}</p>}
           <div className="flex-1" />
           <PilaFuentes dominios={n.fuentes_dominios} total={n.fuentes_total} />
         </div>

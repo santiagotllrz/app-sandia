@@ -45,3 +45,23 @@ export function favicon(dominio: string, tam = 32) {
 export function plural(n: number, uno: string, varios: string) {
   return `${n} ${n === 1 ? uno : varios}`
 }
+
+/**
+ * Meta descripción para Google y redes: frases completas del primer párrafo hasta ~160 caracteres.
+ * El resumen del motor llega cortado con "...", así que no se usa tal cual.
+ */
+export function descripcionMeta(n: { resumen?: string | null; entrada?: { parrafos?: string[] } }, max = 160) {
+  const base = (n.entrada?.parrafos?.[0] ?? n.resumen ?? "").replace(/s*(...|…)s*$/, "").trim()
+  if (base.length <= max) return base
+  let texto = ""
+  for (const frase of base.match(/[^.!?]+[.!?]+(s|$)/g) ?? []) {
+    if ((texto + frase).trim().length > max) break
+    texto += frase
+  }
+  if (texto.trim()) return texto.trim()
+  // Primera frase más larga que el límite: se deja completa (Google la acorta al mostrarla) si no es excesiva.
+  const primera = base.match(/^[^.!?]+[.!?]/)?.[0]
+  if (primera && primera.length <= 300) return primera
+  const corte = base.slice(0, max - 1)
+  return `${corte.slice(0, corte.lastIndexOf(" ")).replace(/[,;:]$/, "")}…`
+}

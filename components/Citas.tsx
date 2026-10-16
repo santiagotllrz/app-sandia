@@ -20,7 +20,7 @@ export function ChipCita({ fuentes }: { fuentes: Fuente[] }) {
         {resto.length > 0 && <span className="text-tertiary">+{resto.length}</span>}
       </a>
       {fuentes.length > 1 && (
-        <span className="invisible absolute bottom-full left-0 z-20 mb-1.5 w-72 rounded-xl border border-borde bg-raised p-1.5 opacity-0 shadow-hover transition-opacity duration-150 group-focus-within/cita:visible group-focus-within/cita:opacity-100 group-hover/cita:visible group-hover/cita:opacity-100">
+        <span className="absolute bottom-full left-0 z-20 mb-1.5 hidden w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-borde bg-raised p-1.5 shadow-hover [@media(hover:hover)]:group-focus-within/cita:block [@media(hover:hover)]:group-hover/cita:block">
           {fuentes.map((f) => (
             <a
               key={f.id}

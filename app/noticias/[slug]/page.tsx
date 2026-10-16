@@ -12,7 +12,7 @@ import { JsonLd } from "@/components/JsonLd"
 import { TarjetaPequena } from "@/components/Tarjetas"
 import { almacen } from "@/lib/almacen"
 import { rutas, sitio, urlAbsoluta } from "@/lib/config"
-import { dominio, favicon, formatoFechaCorta, formatoFechaLarga } from "@/lib/formato"
+import { descripcionMeta, dominio, favicon, formatoFechaCorta, formatoFechaLarga } from "@/lib/formato"
 import { IMAGEN_OG, jsonLdMigas, jsonLdNoticia } from "@/lib/seo"
 import type { Fuente, NoticiaResumen } from "@/lib/tipos"
 
@@ -41,19 +41,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!datos) return { title: "Noticia no encontrada", robots: { index: false } }
   const { noticia: n, tema } = datos
   const ruta = rutas.noticia(n.slug)
+  const description = descripcionMeta(n.datos)
   const imagen = n.imagen
     ? [{ url: n.imagen, width: n.imagen_ancho ?? undefined, height: n.imagen_alto ?? undefined, alt: n.imagen_alt ?? n.titular }]
     : [IMAGEN_OG]
   return {
     title: n.titular,
-    description: n.resumen ?? undefined,
+    description,
     keywords: n.etiquetas,
     alternates: { canonical: ruta },
     openGraph: {
       type: "article",
       url: ruta,
       title: n.titular,
-      description: n.resumen ?? undefined,
+      description,
       siteName: sitio.nombre,
       locale: sitio.locale,
       publishedTime: n.publicada_at,
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       tags: n.etiquetas,
       images: imagen,
     },
-    twitter: { card: "summary_large_image", title: n.titular, description: n.resumen ?? undefined, images: imagen.map((i) => i.url) },
+    twitter: { card: "summary_large_image", title: n.titular, description, images: imagen.map((i) => i.url) },
   }
 }
 
@@ -106,7 +107,6 @@ export default async function PaginaNoticia({ params }: Props) {
 
           <header className="flex flex-col gap-4">
             <h1 className="font-editorial text-[2rem] leading-[1.15] md:text-[2.6rem]">{n.titular}</h1>
-            {n.resumen && <p className="text-lg leading-relaxed text-secondary">{n.resumen}</p>}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-secondary">
                 <span className="flex items-center gap-1">
@@ -249,7 +249,7 @@ function FilaFuentes({ fuentes }: { fuentes: Fuente[] }) {
           href={f.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col gap-1.5 rounded-xl bg-subtle p-2.5 transition-colors hover:bg-soft"
+          className="flex min-w-0 flex-col gap-1.5 rounded-xl bg-subtle p-2.5 transition-colors hover:bg-soft"
         >
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-secondary">
             {/* eslint-disable-next-line @next/next/no-img-element */}

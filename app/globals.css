@@ -71,6 +71,8 @@ html {
 
 body {
   background: var(--bg-base);
+  /* Red de seguridad: nada puede ensanchar la página en móvil (clip no rompe el header sticky). */
+  overflow-x: clip;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

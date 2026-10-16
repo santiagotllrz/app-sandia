@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { rutas, sitio, urlAbsoluta } from "./config"
+import { descripcionMeta } from "./formato"
 import type { NoticiaCompleta, NoticiaResumen } from "./tipos"
 
 export const IMAGEN_OG = { url: "/og.png", width: 1200, height: 630, alt: sitio.nombre }
@@ -74,7 +75,7 @@ export function jsonLdNoticia(n: NoticiaCompleta, temaNombre: string | null) {
     url,
     headline: n.titular.length > 110 ? `${n.titular.slice(0, 107).trimEnd()}…` : n.titular,
     alternativeHeadline: n.titular.length > 110 ? n.titular : undefined,
-    description: n.resumen ?? undefined,
+    description: descripcionMeta(d),
     inLanguage: d.idioma ?? sitio.idioma,
     datePublished: n.publicada_at,
     dateModified: n.actualizada_at,
