@@ -41,7 +41,7 @@ export default async function Temas() {
                   <ul className="mt-3 flex flex-col divide-y divide-borde border-t border-borde">
                     {t.items.map((n) => (
                       <li key={n.id} className="py-2.5">
-                        <Link href={rutas.noticia(n.slug)} className="line-clamp-2 text-sm leading-snug hover:text-acento">
+                        <Link href={rutas.noticia(n.slug)} className="block text-sm leading-snug hover:text-acento">
                           {n.titular}
                         </Link>
                         <FechaRelativa iso={n.publicada_at} className="text-xs text-tertiary" />

@@ -32,7 +32,7 @@ export function TarjetaGrande({
         />
         <div className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Titulo className="font-editorial line-clamp-3 text-[1.5rem] text-primary transition-colors duration-150 group-hover:text-acento md:text-[1.75rem]">
+            <Titulo className="font-editorial text-[1.5rem] text-primary transition-colors duration-150 group-hover:text-acento md:text-[1.75rem]">
               {n.titular}
             </Titulo>
             <div className="flex items-center gap-1 text-xs font-medium text-secondary">
@@ -64,7 +64,7 @@ export function TarjetaPequena({ noticia: n, Titulo = "h2" }: { noticia: Noticia
           className="aspect-[3/2] shrink-0"
         />
         <div className="flex grow flex-col gap-3 py-2.5">
-          <Titulo className="line-clamp-3 px-4 text-base font-medium leading-snug text-primary transition-colors duration-150 group-hover:text-acento">
+          <Titulo className="px-4 text-base font-medium leading-snug text-primary transition-colors duration-150 group-hover:text-acento">
             {n.titular}
           </Titulo>
           <div className="flex-1" />

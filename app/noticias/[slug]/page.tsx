@@ -187,7 +187,7 @@ export default async function PaginaNoticia({ params }: Props) {
                     <Link href={rutas.noticia(r.slug)} className="group flex gap-3 py-3">
                       <ImagenNoticia src={r.imagen} alt="" sizes="96px" className="aspect-[4/3] w-24 shrink-0 rounded-lg" />
                       <span className="flex min-w-0 flex-col gap-1">
-                        <span className="line-clamp-3 text-sm font-medium leading-snug group-hover:text-acento">{r.titular}</span>
+                        <span className="text-sm font-medium leading-snug group-hover:text-acento">{r.titular}</span>
                         <FechaRelativa iso={r.publicada_at} className="text-xs text-tertiary" />
                       </span>
                     </Link>
@@ -256,7 +256,7 @@ function FilaFuentes({ fuentes }: { fuentes: Fuente[] }) {
             <img src={favicon(dominio(f.url))} alt="" width={14} height={14} loading="lazy" className="size-3.5 rounded-full" />
             <span className="truncate">{f.medio}</span>
           </span>
-          <span className="line-clamp-2 text-xs leading-snug">{f.titulo}</span>
+          <span className="text-xs leading-snug">{f.titulo}</span>
         </a>
       ))}
       {resto > 0 && (

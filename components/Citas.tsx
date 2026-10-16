@@ -34,7 +34,7 @@ export function ChipCita({ fuentes }: { fuentes: Fuente[] }) {
                 <img src={favicon(dominio(f.url))} alt="" width={12} height={12} loading="lazy" className="size-3 rounded-full" />
                 {f.medio}
               </span>
-              <span className="line-clamp-2 text-xs leading-snug text-primary">{f.titulo}</span>
+              <span className="text-xs leading-snug text-primary">{f.titulo}</span>
             </a>
           ))}
         </span>
