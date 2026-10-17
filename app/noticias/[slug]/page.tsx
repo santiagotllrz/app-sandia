@@ -107,6 +107,7 @@ export default async function PaginaNoticia({ params }: Props) {
 
           <header className="flex flex-col gap-4">
             <h1 className="font-editorial text-[2rem] leading-[1.15] md:text-[2.6rem]">{n.titular}</h1>
+            {n.resumen && <p className="text-lg leading-relaxed text-secondary">{n.resumen}</p>}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-secondary">
                 <span className="flex items-center gap-1">
