@@ -91,8 +91,7 @@ export function jsonLdNoticia(n: NoticiaCompleta, temaNombre: string | null) {
             width: n.imagen_ancho ?? undefined,
             height: n.imagen_alto ?? undefined,
             caption: n.imagen_alt ?? undefined,
-            creditText: credito?.texto ?? undefined,
-            copyrightHolder: credito?.medio ? { "@type": "Organization", name: credito.medio } : undefined,
+            ...metadatosImagen(d.imagen?.credito, url),
           },
         ]
       : undefined,
@@ -107,6 +106,28 @@ export function jsonLdNoticia(n: NoticiaCompleta, temaNombre: string | null) {
       datePublished: f.fecha ?? undefined,
     })),
     isBasedOn: d.url_original ?? undefined,
+  }
+}
+
+/**
+ * Campos de "Metadatos de imagen" que pide Google (creator, creditText, copyrightNotice, license,
+ * acquireLicensePage). Las fotos son de terceros: los derechos son del medio o autor que las publicó,
+ * así que licencia y página de licencia apuntan a la publicación original de la foto.
+ */
+function metadatosImagen(
+  credito: { texto?: string; medio?: string; autor?: string | null; url_origen?: string } | undefined,
+  urlNoticia: string,
+) {
+  const titular = credito?.medio?.trim() || sitio.nombre
+  const autor = credito?.autor?.trim()
+  const origen = credito?.url_origen || urlNoticia
+  return {
+    creditText: credito?.texto?.trim() || `Foto: ${titular}`,
+    creator: autor ? { "@type": "Person", name: autor } : { "@type": "Organization", name: titular },
+    copyrightHolder: { "@type": "Organization", name: titular },
+    copyrightNotice: `© ${titular}`,
+    license: origen,
+    acquireLicensePage: origen,
   }
 }
 
