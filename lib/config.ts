@@ -14,6 +14,10 @@ export const sitio = {
   ).replace(/\/$/, ""),
   // Ubicación por defecto del widget de clima cuando no se conoce la del visitante.
   climaPorDefecto: { ciudad: "Bogotá", lat: 4.711, lon: -74.0721 },
+  redes: {
+    instagram: "https://www.instagram.com/indiceagro.co",
+    facebook: "https://www.facebook.com/people/%C3%8Dndice-Agro/61593986745138/",
+  },
 }
 
 /** Solo el despliegue de producción se indexa; las vistas previas de Vercel quedan fuera de Google. */

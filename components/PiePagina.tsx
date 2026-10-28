@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { rutas, sitio } from "@/lib/config"
 import type { Tema } from "@/lib/tipos"
-import { IconoRss } from "./Iconos"
+import { IconoFacebook, IconoInstagram, IconoRss } from "./Iconos"
 import { Logo } from "./Logo"
 
 export function PiePagina({ temas }: { temas: Tema[] }) {
@@ -13,9 +13,23 @@ export function PiePagina({ temas }: { temas: Tema[] }) {
             <Logo className="h-8" />
           </Link>
           <p className="max-w-xs text-sm text-secondary">{sitio.descripcion}</p>
-          <a href="/rss.xml" className="inline-flex w-fit items-center gap-1.5 text-sm text-secondary hover:text-primary">
-            <IconoRss className="size-4" /> RSS
-          </a>
+          <ul className="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label="Redes sociales">
+            <li>
+              <a href={sitio.redes.instagram} target="_blank" rel="noopener noreferrer me" className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-primary">
+                <IconoInstagram className="size-4" /> Instagram
+              </a>
+            </li>
+            <li>
+              <a href={sitio.redes.facebook} target="_blank" rel="noopener noreferrer me" className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-primary">
+                <IconoFacebook className="size-4" /> Facebook
+              </a>
+            </li>
+            <li>
+              <a href="/rss.xml" className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-primary">
+                <IconoRss className="size-4" /> RSS
+              </a>
+            </li>
+          </ul>
         </div>
         <nav aria-label="Temas">
           <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-tertiary">Temas</h2>

@@ -85,6 +85,20 @@ export const IconoRss = (p: P) => (
   </Base>
 )
 
+export const IconoInstagram = (p: P) => (
+  <Base {...p}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="17.3" cy="6.7" r=".6" fill="currentColor" />
+  </Base>
+)
+
+export const IconoFacebook = (p: P) => (
+  <Base {...p}>
+    <path d="M14.5 8.5h2V5h-2.5A3.5 3.5 0 0 0 10.5 8.5V11H8v3.5h2.5V21H14v-6.5h2.4L17 11h-3V9a.5.5 0 0 1 .5-.5Z" />
+  </Base>
+)
+
 // ── Clima ──
 const sol = (
   <>
