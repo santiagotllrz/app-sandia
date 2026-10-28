@@ -17,6 +17,7 @@ const texto = (cuerpo: string, status: number) => new Response(cuerpo, { status 
 /** Todo el portal muestra noticias (inicio, temas, destacados, sitemaps, RSS, menú de temas). */
 function regenerarPortal() {
   revalidatePath("/", "layout")
+  for (const ruta of ["/sitemap.xml", "/news-sitemap.xml", "/rss.xml"]) revalidatePath(ruta)
 }
 
 export async function POST(req: Request) {

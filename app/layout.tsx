@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Newsreader } from "next/font/google"
+import localFont from "next/font/local"
 import { Encabezado } from "@/components/Encabezado"
 import { JsonLd } from "@/components/JsonLd"
 import { PiePagina } from "@/components/PiePagina"
@@ -9,8 +9,9 @@ import { IMAGEN_OG, jsonLdOrganizacion, jsonLdSitio } from "@/lib/seo"
 import type { Tema } from "@/lib/tipos"
 import "./globals.css"
 
-const sans = Geist({ subsets: ["latin"], variable: "--fuente-sans", display: "swap" })
-const editorial = Newsreader({ subsets: ["latin"], variable: "--fuente-editorial", display: "swap", weight: ["400", "500", "600"] })
+// Fuentes guardadas en el proyecto (variables, solo latín): el build no depende de Google Fonts.
+const sans = localFont({ src: "./fonts/geist.woff2", variable: "--fuente-sans", display: "swap", weight: "100 900" })
+const editorial = localFont({ src: "./fonts/newsreader.woff2", variable: "--fuente-editorial", display: "swap", weight: "200 800" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(sitio.url),
