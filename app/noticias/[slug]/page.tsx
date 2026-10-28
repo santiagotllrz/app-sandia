@@ -186,7 +186,7 @@ export default async function PaginaNoticia({ params }: Props) {
                 {relacionadas.slice(0, 5).map((r) => (
                   <li key={r.id}>
                     <Link href={rutas.noticia(r.slug)} className="group flex gap-3 py-3">
-                      <ImagenNoticia src={r.imagen} alt="" sizes="96px" className="aspect-[4/3] w-24 shrink-0 rounded-lg" />
+                      <ImagenNoticia src={r.imagen} alt="" sizes="192px" className="aspect-[4/3] w-24 shrink-0 rounded-lg" />
                       <span className="flex min-w-0 flex-col gap-1">
                         <span className="text-sm font-medium leading-snug group-hover:text-acento">{r.titular}</span>
                         <FechaRelativa iso={r.publicada_at} className="text-xs text-tertiary" />
