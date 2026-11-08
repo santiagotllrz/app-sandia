@@ -14,8 +14,8 @@ export const sitio = {
   ).replace(/\/$/, ""),
   // Ubicación por defecto del widget de clima cuando no se conoce la del visitante.
   climaPorDefecto: { ciudad: "Bogotá", lat: 4.711, lon: -74.0721 },
-  // A dónde lleva el botón de la página de enlaces. Se cambia con NEXT_PUBLIC_ALERTAS_URL.
-  alertasUrl: process.env.NEXT_PUBLIC_ALERTAS_URL || null,
+  // A dónde lleva el botón de alertas de la página de enlaces (NEXT_PUBLIC_ALERTAS_URL lo cambia).
+  alertasUrl: process.env.NEXT_PUBLIC_ALERTAS_URL || "https://usesandia.com",
   redes: {
     instagram: "https://www.instagram.com/indiceagro.co",
     facebook: "https://www.facebook.com/people/%C3%8Dndice-Agro/61593986745138/",
