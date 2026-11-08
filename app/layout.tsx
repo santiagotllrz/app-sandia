@@ -1,12 +1,8 @@
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
-import { Encabezado } from "@/components/Encabezado"
 import { JsonLd } from "@/components/JsonLd"
-import { PiePagina } from "@/components/PiePagina"
-import { almacen } from "@/lib/almacen"
 import { indexable, sitio } from "@/lib/config"
 import { IMAGEN_OG, jsonLdOrganizacion, jsonLdSitio } from "@/lib/seo"
-import type { Tema } from "@/lib/tipos"
 import "./globals.css"
 
 // Fuentes guardadas en el proyecto (variables, solo latín): el build no depende de Google Fonts.
@@ -47,29 +43,13 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 }
 
-async function cargarTemas(): Promise<Tema[]> {
-  try {
-    return await (await almacen()).temas()
-  } catch (e) {
-    console.error("[layout] temas", e)
-    return []
-  }
-}
-
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const temas = await cargarTemas()
+// Lo común a todo el sitio. El encabezado y el pie viven en app/(portal)/layout.tsx;
+// la página de enlaces (app/enlaces) queda fuera de ese grupo y no los lleva.
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang={sitio.idioma} className={`${sans.variable} ${editorial.variable}`}>
       <body className="min-h-dvh bg-base text-primary" suppressHydrationWarning>
-        <a
-          href="#contenido"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-raised focus:px-3 focus:py-2 focus:text-sm"
-        >
-          Saltar al contenido
-        </a>
-        <Encabezado temas={temas} />
-        <main id="contenido">{children}</main>
-        <PiePagina temas={temas} />
+        {children}
         <JsonLd datos={[jsonLdOrganizacion(), jsonLdSitio()]} />
       </body>
     </html>

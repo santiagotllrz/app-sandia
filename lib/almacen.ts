@@ -40,8 +40,8 @@ export interface Almacen {
   copiarImagen(id: string, version: number, url: string): Promise<void>
   /** Copia la portada al storage propio y la asocia a la noticia. "no_existe" si la noticia aún no llegó. */
   guardarPortada(id: string, portada: PortadaPayload): Promise<"guardada" | "no_existe">
-  /** Las portadas de la página de enlaces, la más reciente primero. */
-  portadas(limite: number): Promise<PortadaEnlace[]>
+  /** Las portadas de la página de enlaces, la más reciente primero, desde la posición `desde`. */
+  portadas(limite: number, desde?: number): Promise<PortadaEnlace[]>
 }
 
 let instancia: Promise<Almacen> | null = null

@@ -183,11 +183,11 @@ export function almacenLocal(): Almacen {
       return "guardada"
     },
 
-    async portadas(limite) {
+    async portadas(limite, desde = 0) {
       return (await leer()).noticias
         .filter((n) => n.estado === "publicada" && n.portada?.url)
         .sort((a, b) => b.portada!.at.localeCompare(a.portada!.at))
-        .slice(0, limite)
+        .slice(desde, desde + limite)
         .map((n) => ({ slug: n.slug, titular: n.titular, imagen: n.portada!.url, ancho: n.portada!.ancho ?? 480, alto: n.portada!.alto ?? 600 }))
     },
   }

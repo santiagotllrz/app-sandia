@@ -163,14 +163,15 @@ export function almacenSupabase(): Almacen {
       return "guardada"
     },
 
-    async portadas(limite) {
+    async portadas(limite, desde = 0) {
       const { data, error } = await db
         .from("noticias")
         .select("slug,titular,portada_url,portada_ancho,portada_alto")
         .eq("estado", "publicada")
         .not("portada_url", "is", null)
         .order("portada_at", { ascending: false })
-        .limit(limite)
+        .order("id")
+        .range(desde, desde + limite - 1)
       falla("portadas", error)
       return ((data ?? []) as { slug: string; titular: string; portada_url: string; portada_ancho: number | null; portada_alto: number | null }[]).map(
         (f): PortadaEnlace => ({ slug: f.slug, titular: f.titular, imagen: f.portada_url, ancho: f.portada_ancho ?? 480, alto: f.portada_alto ?? 600 }),

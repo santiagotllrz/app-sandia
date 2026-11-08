@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import { GrillaPortadas } from "@/components/GrillaPortadas"
 import { Logo } from "@/components/Logo"
 import { almacen } from "@/lib/almacen"
 import { rutas, sitio } from "@/lib/config"
@@ -9,7 +9,7 @@ import type { PortadaEnlace } from "@/lib/tipos"
 // lleva a su noticia. El webhook la regenera al llegar una portada; esto es la red de seguridad.
 export const revalidate = 300
 
-const LIMITE = 60
+const PRIMERA_TANDA = 30 // el resto llega con scroll infinito desde /api/portadas
 
 export const metadata: Metadata = {
   title: "Enlaces",
@@ -19,21 +19,23 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 }
 
-async function cargar(): Promise<PortadaEnlace[]> {
+async function cargar(): Promise<{ portadas: PortadaEnlace[]; hayMas: boolean }> {
   try {
-    return await (await almacen()).portadas(LIMITE)
+    const filas = await (await almacen()).portadas(PRIMERA_TANDA + 1)
+    return { portadas: filas.slice(0, PRIMERA_TANDA), hayMas: filas.length > PRIMERA_TANDA }
   } catch (e) {
     console.error("[enlaces] portadas", e)
-    return []
+    return { portadas: [], hayMas: false }
   }
 }
 
 export default async function Enlaces() {
-  const portadas = await cargar()
+  const { portadas, hayMas } = await cargar()
   const usuario = sitio.redes.instagram.replace(/\/$/, "").split("/").pop()
 
   return (
-    <div className="mx-auto max-w-[640px] px-4 pb-16 pt-8 md:pt-12">
+    // Página para el link de la bio: sin encabezado, pestañas ni pie (vive fuera del grupo (portal)).
+    <main className="mx-auto max-w-[640px] px-4 pb-16 pt-8 md:pt-12">
       <section className="flex flex-col items-center text-center">
         <Logo className="h-9" />
         {usuario ? <p className="mt-3 text-sm font-medium text-secondary">@{usuario}</p> : null}
@@ -50,38 +52,12 @@ export default async function Enlaces() {
       </a>
 
       {portadas.length ? (
-        <ul className="mt-6 grid grid-cols-3 gap-[3px] overflow-hidden rounded-lg">
-          {portadas.map((p, i) => (
-            <li key={p.slug}>
-              <Link href={rutas.noticia(p.slug)} className="group block aspect-[4/5] overflow-hidden bg-subtle" title={p.titular}>
-                {/* Ya viene comprimida desde el motor (WebP de ~40 KB): pasarla por el optimizador no gana nada. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.imagen}
-                  alt={p.titular}
-                  width={p.ancho}
-                  height={p.alto}
-                  loading={i < 9 ? "eager" : "lazy"}
-                  fetchPriority={i < 3 ? "high" : "auto"}
-                  decoding="async"
-                  className="h-full w-full object-cover transition-opacity duration-200 group-hover:opacity-85"
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-6">
+          <GrillaPortadas iniciales={portadas} hayMasInicial={hayMas} />
+        </div>
       ) : (
         <p className="mt-10 text-center text-sm text-tertiary">Pronto verás aquí las últimas noticias.</p>
       )}
-
-      <div className="mt-8 flex justify-center">
-        <Link
-          href={rutas.inicio()}
-          className="inline-flex h-9 items-center rounded-lg border border-borde-fuerte px-4 text-sm font-medium hover:bg-subtle"
-        >
-          Ver todas las noticias
-        </Link>
-      </div>
-    </div>
+    </main>
   )
 }
