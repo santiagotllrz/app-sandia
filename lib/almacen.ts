@@ -1,5 +1,5 @@
 import "server-only"
-import type { NoticiaCompleta, NoticiaPayload, NoticiaResumen, Pagina, Tema } from "./tipos"
+import type { NoticiaCompleta, NoticiaPayload, NoticiaResumen, Pagina, PortadaEnlace, PortadaPayload, Tema } from "./tipos"
 
 export interface ResultadoUpsert {
   resultado: "creada" | "actualizada" | "ignorada_version"
@@ -38,6 +38,10 @@ export interface Almacen {
   retirarNoticia(id: string, version: number | null, motivo: string | null): Promise<ResultadoRetiro>
   registrarVista(id: string): Promise<void>
   copiarImagen(id: string, version: number, url: string): Promise<void>
+  /** Copia la portada al storage propio y la asocia a la noticia. "no_existe" si la noticia aún no llegó. */
+  guardarPortada(id: string, portada: PortadaPayload): Promise<"guardada" | "no_existe">
+  /** Las portadas de la página de enlaces, la más reciente primero. */
+  portadas(limite: number): Promise<PortadaEnlace[]>
 }
 
 let instancia: Promise<Almacen> | null = null

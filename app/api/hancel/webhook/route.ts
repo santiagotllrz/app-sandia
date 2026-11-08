@@ -87,6 +87,24 @@ export async function POST(req: Request) {
       return json({ ok: true, url: urlAbsoluta(rutas.noticia(r.slug)), ...(r.numero ? { id_externo: String(r.numero) } : {}) })
     }
 
+    if (tipo === "noticia.portada") {
+      const id = evento.noticia?.id
+      const portada = evento.portada
+      if (!id || !portada?.url || !/^https:\/\//.test(portada.url)) {
+        await db.registrarEvento({ ...registro, resultado: "rechazado", error: "faltan noticia.id o portada.url (https)" })
+        return texto("faltan noticia.id o portada.url (https)", 422)
+      }
+      const r = await db.guardarPortada(id, portada)
+      if (r === "no_existe") {
+        // Queda como error para que el reintento del motor no se tome por duplicado.
+        await db.registrarEvento({ ...registro, resultado: "error", error: "la noticia aún no está en el portal" })
+        return texto("la noticia aún no está en el portal; reintentar", 409)
+      }
+      await db.registrarEvento({ ...registro, resultado: "portada" })
+      revalidatePath(rutas.enlaces())
+      return json({ ok: true })
+    }
+
     if (tipo === "noticia.retirada") {
       const n = evento.noticia
       if (!n?.id) {

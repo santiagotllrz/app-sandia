@@ -2,7 +2,7 @@ import "server-only"
 import { promises as fs } from "node:fs"
 import path from "node:path"
 import type { Almacen, RegistroEvento } from "./almacen"
-import type { NoticiaCompleta, NoticiaPayload, NoticiaResumen, Tema } from "./tipos"
+import type { NoticiaCompleta, NoticiaPayload, NoticiaResumen, PortadaPayload, Tema } from "./tipos"
 
 // Solo para desarrollo sin credenciales de Supabase: replica la lógica de las funciones SQL
 // sobre un archivo .data/portal.json para poder probar el webhook y el diseño localmente.
@@ -11,6 +11,7 @@ interface Fila extends NoticiaCompleta {
   numero: number
   estado: "publicada" | "retirada"
   vistas: Record<string, number>
+  portada?: PortadaPayload & { at: string }
 }
 
 interface Estado {
@@ -62,7 +63,7 @@ function dominios(n: NoticiaPayload) {
     .filter((d): d is string => !!d && !vistos.has(d) && !!vistos.add(d))
 }
 
-function aResumen({ numero, estado, vistas, version, etiquetas, minutos_lectura, palabras, datos, ...r }: Fila): NoticiaResumen {
+function aResumen({ numero, estado, vistas, version, etiquetas, minutos_lectura, palabras, datos, portada, ...r }: Fila): NoticiaResumen {
   return r
 }
 
@@ -93,7 +94,7 @@ export function almacenLocal(): Almacen {
     async porSlug(slug) {
       const n = (await leer()).noticias.find((x) => x.slug === slug && x.estado === "publicada")
       if (!n) return null
-      const { numero, estado, vistas, ...completa } = n
+      const { numero, estado, vistas, portada, ...completa } = n
       return completa
     },
 
@@ -128,6 +129,7 @@ export function almacenLocal(): Almacen {
         numero: actual?.numero ?? ++e.secuencia,
         estado: "publicada",
         vistas: actual?.vistas ?? {},
+        portada: actual?.portada,
         version: n.version,
         slug,
         titular: n.titular,
@@ -171,6 +173,23 @@ export function almacenLocal(): Almacen {
     },
 
     async copiarImagen() {},
+
+    async guardarPortada(id, portada) {
+      const e = await leer()
+      const n = e.noticias.find((x) => x.id === id)
+      if (!n) return "no_existe"
+      n.portada = { ...portada, at: portada.publicada_at ?? new Date().toISOString() }
+      await guardar(e)
+      return "guardada"
+    },
+
+    async portadas(limite) {
+      return (await leer()).noticias
+        .filter((n) => n.estado === "publicada" && n.portada?.url)
+        .sort((a, b) => b.portada!.at.localeCompare(a.portada!.at))
+        .slice(0, limite)
+        .map((n) => ({ slug: n.slug, titular: n.titular, imagen: n.portada!.url, ancho: n.portada!.ancho ?? 480, alto: n.portada!.alto ?? 600 }))
+    },
   }
 }
 
@@ -189,5 +208,7 @@ export function almacenVacio(): Almacen {
     retirarNoticia: sinDb,
     registrarVista: async () => {},
     copiarImagen: async () => {},
+    guardarPortada: sinDb,
+    portadas: async () => [],
   }
 }

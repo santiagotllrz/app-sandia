@@ -1,7 +1,10 @@
 import "server-only"
 import { createClient } from "@supabase/supabase-js"
 import type { Almacen, ResultadoRetiro, ResultadoUpsert } from "./almacen"
-import type { NoticiaCompleta, NoticiaResumen } from "./tipos"
+import type { NoticiaCompleta, NoticiaResumen, PortadaEnlace } from "./tipos"
+
+/** Las portadas llegan ya comprimidas (unos 40 KB); esto solo frena algo raro. */
+const MAX_PORTADA_BYTES = 2 * 1024 * 1024
 
 const COLUMNAS_RESUMEN =
   "id,slug,titular,resumen,tema_slug,imagen_url,imagen_url_propia,imagen_ancho,imagen_alto,imagen_alt,fuentes_total,fuentes_dominios,publicada_at,actualizada_at"
@@ -125,6 +128,53 @@ export function almacenSupabase(): Almacen {
       // Solo si la noticia sigue apuntando a esa imagen (no llegó otra versión mientras tanto).
       const upd = await db.from("noticias").update({ imagen_url_propia: publica }).eq("id", id).eq("imagen_url", url)
       falla("imagen_url_propia", upd.error)
+    },
+
+    async guardarPortada(id, portada) {
+      const { data: existe, error: errorExiste } = await db.from("noticias").select("id").eq("id", id).maybeSingle()
+      falla("guardarPortada", errorExiste)
+      if (!existe) return "no_existe"
+
+      const res = await fetch(portada.url, { signal: AbortSignal.timeout(20_000) })
+      if (!res.ok) throw new Error(`descarga de la portada ${res.status}`)
+      const tipo = res.headers.get("content-type")?.split(";")[0] ?? "image/webp"
+      if (!tipo.startsWith("image/")) throw new Error(`la portada no es una imagen (${tipo})`)
+      const bytes = await res.arrayBuffer()
+      if (bytes.byteLength > MAX_PORTADA_BYTES) throw new Error("la portada pesa demasiado")
+
+      const ext = tipo === "image/png" ? "png" : tipo === "image/jpeg" ? "jpg" : "webp"
+      // Un nombre por portada: la ruta se cachea un año, así que reemplazarla en la misma ruta no se vería.
+      const ruta = `${id}/portada-${Date.now().toString(36)}.${ext}`
+      const { error } = await db.storage
+        .from("noticias")
+        .upload(ruta, bytes, { contentType: tipo, upsert: true, cacheControl: "31536000" })
+      falla("storage portada", error)
+
+      const upd = await db
+        .from("noticias")
+        .update({
+          portada_url: db.storage.from("noticias").getPublicUrl(ruta).data.publicUrl,
+          portada_ancho: portada.ancho ?? null,
+          portada_alto: portada.alto ?? null,
+          portada_at: portada.publicada_at ?? new Date().toISOString(),
+        })
+        .eq("id", id)
+      falla("portada_url", upd.error)
+      return "guardada"
+    },
+
+    async portadas(limite) {
+      const { data, error } = await db
+        .from("noticias")
+        .select("slug,titular,portada_url,portada_ancho,portada_alto")
+        .eq("estado", "publicada")
+        .not("portada_url", "is", null)
+        .order("portada_at", { ascending: false })
+        .limit(limite)
+      falla("portadas", error)
+      return ((data ?? []) as { slug: string; titular: string; portada_url: string; portada_ancho: number | null; portada_alto: number | null }[]).map(
+        (f): PortadaEnlace => ({ slug: f.slug, titular: f.titular, imagen: f.portada_url, ancho: f.portada_ancho ?? 480, alto: f.portada_alto ?? 600 }),
+      )
     },
   }
 }

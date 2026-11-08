@@ -1,6 +1,6 @@
 // Formato del webhook de Hancel (version_esquema "1"). Los campos desconocidos se ignoran.
 
-export type TipoEvento = "noticia.publicada" | "noticia.actualizada" | "noticia.retirada" | "ping"
+export type TipoEvento = "noticia.publicada" | "noticia.actualizada" | "noticia.retirada" | "noticia.portada" | "ping"
 
 export interface Fuente {
   id: string
@@ -52,6 +52,24 @@ export interface EventoWebhook {
   evento: { id: string; tipo: TipoEvento | string; creado_at?: string; version_esquema?: string }
   empresa?: { id?: string; slug?: string; nombre?: string }
   noticia?: Partial<NoticiaPayload> & { motivo?: string }
+  /** Solo en noticia.portada: la portada del carrusel, ya comprimida por el motor. */
+  portada?: PortadaPayload
+}
+
+export interface PortadaPayload {
+  url: string
+  ancho?: number | null
+  alto?: number | null
+  publicada_at?: string | null
+}
+
+/** Una celda de la página de enlaces. */
+export interface PortadaEnlace {
+  slug: string
+  titular: string
+  imagen: string
+  ancho: number
+  alto: number
 }
 
 // Lo que leen las páginas.
