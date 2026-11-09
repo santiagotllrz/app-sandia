@@ -44,7 +44,7 @@ export function GrillaPortadas({ iniciales, hayMasInicial }: { iniciales: Portad
       <ul className="grid grid-cols-3 gap-[3px] overflow-hidden rounded-lg">
         {portadas.map((p, i) => (
           <li key={p.slug}>
-            <Link href={rutas.noticia(p.slug)} className="group block aspect-[4/5] overflow-hidden bg-subtle" title={p.titular}>
+            <Link href={rutas.noticia(p.slug)} data-medir="portada" data-slug={p.slug} className="group block aspect-[4/5] overflow-hidden bg-subtle" title={p.titular}>
               {/* Ya viene comprimida desde el motor (WebP de ~40 KB): pasarla por el optimizador no gana nada. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

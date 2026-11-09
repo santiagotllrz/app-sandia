@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import localFont from "next/font/local"
 import { JsonLd } from "@/components/JsonLd"
+import { Medidor } from "@/components/Medidor"
 import { indexable, sitio } from "@/lib/config"
 import { IMAGEN_OG, jsonLdOrganizacion, jsonLdSitio } from "@/lib/seo"
 import "./globals.css"
@@ -50,6 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang={sitio.idioma} className={`${sans.variable} ${editorial.variable}`}>
       <body className="min-h-dvh bg-base text-primary" suppressHydrationWarning>
         {children}
+        {/* Mide solo en producción: ni las vistas previas de Vercel ni el desarrollo local ensucian las cifras. */}
+        <Medidor activo={process.env.VERCEL_ENV === "production"} />
         <JsonLd datos={[jsonLdOrganizacion(), jsonLdSitio()]} />
       </body>
     </html>

@@ -30,6 +30,7 @@ export function BotonCompartir({ titulo, url, compacto = false }: { titulo?: str
     <button
       type="button"
       onClick={compartir}
+      data-medir="compartir"
       className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-borde-fuerte text-sm font-medium text-primary transition-colors duration-300 hover:bg-subtle ${
         compacto ? "aspect-[9/8] justify-center" : "px-3"
       }`}

@@ -46,6 +46,7 @@ export default async function Enlaces() {
 
       <a
         href={sitio.alertasUrl}
+        data-medir="alertas"
         className="mt-6 flex h-12 w-full items-center justify-center rounded-xl border border-borde-fuerte bg-raised px-4 text-[0.95rem] font-semibold transition-colors hover:bg-subtle"
       >
         Active las alertas de precios agrícolas
