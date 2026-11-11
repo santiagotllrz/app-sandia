@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache"
 import { after } from "next/server"
 import { almacen } from "@/lib/almacen"
 import { rutas, urlAbsoluta } from "@/lib/config"
+import { avisarIndexNow } from "@/lib/indexnow"
 import type { EventoWebhook, NoticiaPayload } from "@/lib/tipos"
 import { normalizarNoticia, validarNoticia, verificarFirma } from "@/lib/webhook"
 
@@ -18,6 +19,11 @@ const texto = (cuerpo: string, status: number) => new Response(cuerpo, { status 
 function regenerarPortal() {
   revalidatePath("/", "layout")
   for (const ruta of ["/sitemap.xml", "/news-sitemap.xml", "/rss.xml"]) revalidatePath(ruta)
+}
+
+/** La noticia y los listados donde aparece, para IndexNow. */
+function urlsAfectadas(slug: string, tema: string | null) {
+  return [rutas.noticia(slug), rutas.inicio(), ...(tema ? [rutas.tema(tema)] : [])].map((r) => urlAbsoluta(r))
 }
 
 export async function POST(req: Request) {
@@ -72,6 +78,7 @@ export async function POST(req: Request) {
 
       if (r.resultado !== "ignorada_version") {
         regenerarPortal()
+        after(() => avisarIndexNow(urlsAfectadas(r.slug, r.tema_slug)))
         const imagen = noticia.imagen?.url
         if (imagen) {
           after(async () => {
@@ -113,7 +120,11 @@ export async function POST(req: Request) {
       }
       const r = await db.retirarNoticia(n.id, n.version ?? null, n.motivo ?? null)
       await db.registrarEvento({ ...registro, resultado: r.resultado })
-      if (r.resultado === "retirada") regenerarPortal()
+      if (r.resultado === "retirada") {
+        regenerarPortal()
+        // El buscador vuelve a pedir la URL, ve el 404 y la saca del índice.
+        if (r.slug) after(() => avisarIndexNow(urlsAfectadas(r.slug!, r.tema_slug)))
+      }
       return json({ ok: true })
     }
 
