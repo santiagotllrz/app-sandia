@@ -19,6 +19,7 @@ export const sitio = {
   redes: {
     instagram: "https://www.instagram.com/indiceagro.co",
     facebook: "https://www.facebook.com/people/%C3%8Dndice-Agro/61593986745138/",
+    linkedin: "https://linkedin.com/company/indice-agro",
   },
 }
 
