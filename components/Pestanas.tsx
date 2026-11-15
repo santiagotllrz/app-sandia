@@ -38,7 +38,7 @@ export function Pestanas({ temas }: { temas: Tema[] }) {
   const estilo = (clave: string) => `${base} ${activa === clave ? `opacity-100 ${subrayado}` : "opacity-70"}`
 
   return (
-    <nav aria-label="Secciones" className="h-full">
+    <nav aria-label="Secciones" className="relative h-full">
       <ul className="flex h-full items-stretch gap-5">
         <li>
           <Link href={rutas.inicio()} className={estilo("inicio")} aria-current={activa === "inicio" ? "page" : undefined}>
@@ -50,13 +50,13 @@ export function Pestanas({ temas }: { temas: Tema[] }) {
             Destacados
           </Link>
         </li>
-        <li className="relative">
+        <li className="md:relative">
           <details ref={menu} className="group h-full">
             <summary className={`${estilo("temas")} cursor-pointer select-none gap-1`}>
               Temas
               <IconoFlechaAbajo className="size-3.5 transition-transform duration-200 group-open:rotate-180" />
             </summary>
-            <div className="z-30 rounded-xl border border-borde bg-raised p-1.5 shadow-hover max-md:fixed max-md:inset-x-4 max-md:top-[104px] md:absolute md:left-1/2 md:top-full md:mt-1 md:w-72 md:-translate-x-1/2">
+            <div className="absolute inset-x-0 top-full z-30 mt-1.5 rounded-xl border border-borde bg-raised p-1.5 shadow-hover md:inset-x-auto md:left-1/2 md:mt-1 md:w-72 md:-translate-x-1/2">
               <ul>
                 {temas.map((t) => (
                   <li key={t.slug}>

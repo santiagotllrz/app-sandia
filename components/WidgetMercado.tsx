@@ -15,23 +15,23 @@ function FilaProducto({ p, tipo }: { p: PrecioProducto; tipo: "alza" | "baja" })
   const signo = esAlza ? "+" : "−"
 
   return (
-    <li className="flex items-center gap-2 px-2.5 py-2">
+    <li className="flex items-center gap-1.5 px-2 py-2">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={p.imagen}
         alt=""
-        width={28}
-        height={28}
+        width={24}
+        height={24}
         loading="lazy"
-        className="size-7 shrink-0 rounded-lg bg-subtle p-1 object-contain"
+        className="size-6 shrink-0 rounded-md bg-subtle p-0.5 object-contain"
       />
       <div className="min-w-0 flex-1">
         <div className="truncate text-xs font-medium leading-tight text-primary" title={p.nombre}>
           {p.nombre}
         </div>
-        <div className="mt-0.5 flex items-baseline justify-between gap-1 text-[11px] tabular-nums">
-          <span className="truncate text-secondary">${entero.format(p.precioKilo)}/kg</span>
-          <span className={`shrink-0 font-medium ${color}`}>
+        <div className="mt-0.5 flex items-baseline justify-between gap-1 text-[11px] whitespace-nowrap tabular-nums">
+          <span className="text-secondary">${entero.format(p.precioKilo)}/kg</span>
+          <span className={`font-medium ${color}`}>
             {signo}
             {decimal.format(Math.abs(p.porcentaje))}%
           </span>
