@@ -15,8 +15,8 @@
   --border-base: rgb(0 0 0 / 0.15);
   --accent: #5c5c5c;
   --accent-soft: rgb(0 0 0 / 0.06);
-  --positivo: #262626;
-  --negativo: #737373;
+  --positivo: #15803d;
+  --negativo: #dc2626;
   --shadow-hover: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px -6px rgb(0 0 0 / 0.12);
   color-scheme: light;
 }
@@ -35,8 +35,8 @@
     --border-base: rgb(255 255 255 / 0.15);
     --accent: #b3b3b3;
     --accent-soft: rgb(255 255 255 / 0.08);
-    --positivo: #e5e5e5;
-    --negativo: #8a8a8a;
+    --positivo: #4ade80;
+    --negativo: #f87171;
     --shadow-hover: 0 0 0 1px rgb(255 255 255 / 0.06), 0 8px 24px -8px rgb(0 0 0 / 0.6);
     color-scheme: dark;
   }
@@ -118,6 +118,26 @@ details > summary {
 }
 details > summary::-webkit-details-marker {
   display: none;
+}
+
+@keyframes cinta-precios {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.cinta-precios {
+  display: flex;
+  width: max-content;
+  animation: cinta-precios 110s linear infinite;
+}
+
+.cinta-precios:hover,
+.cinta-precios:active {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {

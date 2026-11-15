@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { sitio } from "@/lib/config"
 import type { Tema } from "@/lib/tipos"
+import { BarraPrecios } from "./BarraPrecios"
 import { BotonCompartir } from "./BotonCompartir"
 import { Logo } from "./Logo"
 import { Pestanas } from "./Pestanas"
@@ -8,6 +9,7 @@ import { Pestanas } from "./Pestanas"
 export function Encabezado({ temas }: { temas: Tema[] }) {
   return (
     <header className="sticky top-0 z-20 border-b border-borde bg-base/90 backdrop-blur-md supports-[backdrop-filter]:bg-base/80">
+      <BarraPrecios />
       <div className="mx-auto grid h-14 max-w-[1240px] grid-cols-[1fr_auto] items-center gap-x-4 px-4 md:grid-cols-[1fr_auto_1fr] md:px-8">
         <Link href="/" className="flex w-fit items-center" aria-label={`${sitio.nombre}, inicio`}>
           <Logo className="h-7" />

@@ -1,40 +1,90 @@
-import { indicadoresMercado } from "@/lib/mercado"
+import { obtenerMercado, type PrecioProducto } from "@/lib/mercado"
 
-const numero = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 2 })
+const entero = new Intl.NumberFormat("es-CO", { maximumFractionDigits: 0 })
+const decimal = new Intl.NumberFormat("es-CO", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+const fechaDia = new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", timeZone: "America/Bogota" })
 
-export function WidgetMercado() {
+function formatearFecha(isoFecha: string) {
+  const d = new Date(`${isoFecha}T12:00:00-05:00`)
+  return Number.isNaN(d.getTime()) ? isoFecha : fechaDia.format(d).replace(/\./g, "").replace(/ de /g, " ")
+}
+
+function FilaProducto({ p, tipo }: { p: PrecioProducto; tipo: "alza" | "baja" }) {
+  const esAlza = tipo === "alza"
+  const color = esAlza ? "text-positivo" : "text-negativo"
+  const signo = esAlza ? "+" : "−"
+
   return (
-    <section aria-labelledby="titulo-mercado" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+    <li className="flex items-center gap-2 px-2.5 py-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={p.imagen}
+        alt=""
+        width={28}
+        height={28}
+        loading="lazy"
+        className="size-7 shrink-0 rounded-lg bg-subtle p-1 object-contain"
+      />
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-xs font-medium leading-tight text-primary" title={p.nombre}>
+          {p.nombre}
+        </div>
+        <div className="mt-0.5 flex items-baseline justify-between gap-1 text-[11px] tabular-nums">
+          <span className="truncate text-secondary">${entero.format(p.precioKilo)}/kg</span>
+          <span className={`shrink-0 font-medium ${color}`}>
+            {signo}
+            {decimal.format(Math.abs(p.porcentaje))}%
+          </span>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+export async function WidgetMercado() {
+  const mercado = await obtenerMercado()
+  if (!mercado || (!mercado.subieron.length && !mercado.bajaron.length)) return null
+
+  return (
+    <section aria-labelledby="titulo-mercado" className="flex flex-col gap-2.5">
+      <div className="flex items-center justify-between gap-2">
         <h2 id="titulo-mercado" className="text-sm font-medium">
           Perspectiva del mercado
         </h2>
-        <span className="rounded-full bg-subtle px-2 py-0.5 text-[11px] font-medium text-tertiary">Próximamente</span>
+        <span className="text-[11px] text-tertiary">
+          {formatearFecha(mercado.fecha)} · {mercado.central}
+        </span>
       </div>
-      <ul className="grid grid-cols-2 gap-2">
-        {indicadoresMercado.map((i) => {
-          const sube = (i.variacion ?? 0) >= 0
-          const color = i.variacion == null ? "text-tertiary" : sube ? "text-positivo" : "text-negativo"
-          return (
-            <li key={i.nombre} className="flex flex-col gap-1 rounded-xl border border-borde bg-raised p-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-xs font-medium">{i.nombre}</span>
-                <span className={`text-xs font-medium tabular-nums ${color}`}>
-                  {i.variacion == null ? "—" : `${sube ? "▲" : "▼"} ${numero.format(Math.abs(i.variacion))}%`}
-                </span>
-              </div>
-              <span className="text-sm font-medium tabular-nums">{i.valor == null ? "—" : numero.format(i.valor)}</span>
-              <span className="flex justify-between text-[11px] text-tertiary">
-                <span>{i.unidad}</span>
-                <span className={`tabular-nums ${color}`}>{i.cambio == null ? "" : `${i.cambio >= 0 ? "+" : "−"}${numero.format(Math.abs(i.cambio))}`}</span>
-              </span>
-              <svg viewBox="0 0 100 24" className="mt-1 h-6 w-full text-borde-fuerte" aria-hidden="true">
-                <path d="M0 14 Q 12 10 24 13 T 48 12 T 72 14 T 100 11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
-              </svg>
-            </li>
-          )
-        })}
-      </ul>
+
+      <div className="grid grid-cols-2 divide-x divide-borde overflow-hidden rounded-xl border border-borde bg-raised">
+        <div className="min-w-0">
+          <div className="flex items-center justify-between border-b border-borde bg-subtle px-2.5 py-1.5 text-[11px] font-medium">
+            <span className="text-secondary">Más subieron</span>
+            <span className="text-positivo" aria-hidden="true">
+              ↗
+            </span>
+          </div>
+          <ul className="divide-y divide-borde" aria-label="Productos que más subieron">
+            {mercado.subieron.map((p) => (
+              <FilaProducto key={p.slug} p={p} tipo="alza" />
+            ))}
+          </ul>
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex items-center justify-between border-b border-borde bg-subtle px-2.5 py-1.5 text-[11px] font-medium">
+            <span className="text-secondary">Más bajaron</span>
+            <span className="text-negativo" aria-hidden="true">
+              ↘
+            </span>
+          </div>
+          <ul className="divide-y divide-borde" aria-label="Productos que más bajaron">
+            {mercado.bajaron.map((p) => (
+              <FilaProducto key={p.slug} p={p} tipo="baja" />
+            ))}
+          </ul>
+        </div>
+      </div>
     </section>
   )
 }

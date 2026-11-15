@@ -10,6 +10,7 @@ import { IconoLibro, IconoReloj } from "@/components/Iconos"
 import { ImagenNoticia } from "@/components/ImagenNoticia"
 import { JsonLd } from "@/components/JsonLd"
 import { TarjetaPequena } from "@/components/Tarjetas"
+import { WidgetMercado } from "@/components/WidgetMercado"
 import { almacen } from "@/lib/almacen"
 import { rutas, sitio, urlAbsoluta } from "@/lib/config"
 import { descripcionMeta, dominio, favicon, formatoFechaCorta, formatoFechaLarga } from "@/lib/formato"
@@ -190,13 +191,14 @@ export default async function PaginaNoticia({ params }: Props) {
           {d.fuentes.length > 0 && <ListaFuentes fuentes={fuentesOrdenadas} />}
         </article>
 
-        <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start" aria-labelledby="titulo-relacionadas">
+        <aside className="flex flex-col gap-6 lg:sticky lg:top-20 lg:self-start" aria-label="Mercado y noticias relacionadas">
+          <WidgetMercado />
           {relacionadas.length > 0 && (
-            <>
+            <div className="flex flex-col gap-4">
               <h2 id="titulo-relacionadas" className="text-sm font-medium">
                 {tema ? `Más de ${tema.nombre}` : "Más noticias"}
               </h2>
-              <ul className="flex flex-col divide-y divide-borde">
+              <ul className="flex flex-col divide-y divide-borde" aria-labelledby="titulo-relacionadas">
                 {relacionadas.slice(0, 5).map((r) => (
                   <li key={r.id}>
                     <Link href={rutas.noticia(r.slug)} className="group flex gap-3 py-3">
@@ -209,7 +211,7 @@ export default async function PaginaNoticia({ params }: Props) {
                   </li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
         </aside>
       </div>
