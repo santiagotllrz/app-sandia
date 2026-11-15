@@ -19,7 +19,7 @@ export const sitio = {
   contacto: process.env.NEXT_PUBLIC_CONTACTO_EMAIL || "contacto@usesandia.com",
   redes: {
     instagram: "https://www.instagram.com/indiceagro.co",
-    facebook: "https://www.facebook.com/people/%C3%8Dndice-Agro/61593986745138/",
+    facebook: "https://www.facebook.com/indiceagro/",
     linkedin: "https://linkedin.com/company/indice-agro",
   },
 }
