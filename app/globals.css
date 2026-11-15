@@ -119,6 +119,14 @@ details > summary::-webkit-details-marker {
   animation-play-state: paused;
 }
 
+.barra-oculta {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.barra-oculta::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

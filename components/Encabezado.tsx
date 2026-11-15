@@ -10,7 +10,7 @@ export function Encabezado({ temas }: { temas: Tema[] }) {
   return (
     <>
       <BarraPrecios />
-      <header className="sticky top-0 z-20 border-b border-borde bg-base/95 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b border-borde bg-base">
         <div className="mx-auto grid h-14 max-w-[1240px] grid-cols-[1fr_auto] items-center gap-x-4 px-4 md:grid-cols-[1fr_auto_1fr] md:px-8">
           <Link href="/" className="flex w-fit items-center" aria-label={`${sitio.nombre}, inicio`}>
             <Logo className="h-7" />

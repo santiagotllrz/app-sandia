@@ -191,7 +191,10 @@ export default async function PaginaNoticia({ params }: Props) {
           {d.fuentes.length > 0 && <ListaFuentes fuentes={fuentesOrdenadas} />}
         </article>
 
-        <aside className="flex flex-col gap-6 lg:sticky lg:top-20 lg:self-start" aria-label="Mercado y noticias relacionadas">
+        <aside
+          className="barra-oculta flex flex-col gap-6 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-5.5rem)] lg:self-start lg:overflow-y-auto lg:pb-6"
+          aria-label="Mercado y noticias relacionadas"
+        >
           <WidgetMercado />
           {relacionadas.length > 0 && (
             <div className="flex flex-col gap-4">
