@@ -9,10 +9,10 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: sitio.idioma,
     start_url: "/",
     display: "standalone",
-    background_color: "#fafafa",
-    theme_color: "#fafafa",
+    background_color: "#ffffff",
+    theme_color: "#ffffff",
     icons: [
-      { src: "/icon.png", type: "image/png", sizes: "180x180" },
+      { src: "/icon.png", type: "image/png", sizes: "1024x1024" },
     ],
   }
 }

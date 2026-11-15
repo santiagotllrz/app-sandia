@@ -16,7 +16,7 @@ export function jsonLdOrganizacion() {
     name: sitio.nombre,
     description: sitio.descripcion,
     url: urlAbsoluta("/"),
-    logo: { "@type": "ImageObject", url: urlAbsoluta("/logo.svg"), width: 724, height: 236 },
+    logo: { "@type": "ImageObject", url: urlAbsoluta("/logo.svg"), width: 346, height: 166 },
     areaServed: { "@type": "Country", name: "Colombia" },
     knowsLanguage: sitio.idioma,
     sameAs: Object.values(sitio.redes),

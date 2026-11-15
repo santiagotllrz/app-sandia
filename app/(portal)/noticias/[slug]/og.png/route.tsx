@@ -33,13 +33,13 @@ export async function GET(_req: Request, { params }: Props) {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "64px 76px",
-          background: "#fafafa",
+          background: "#ffffff",
           color: "#171717",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} width={310} height={101} alt="" />
+          <img src={src} width={210} height={101} alt="" />
           {tema ? (
             <div
               style={{

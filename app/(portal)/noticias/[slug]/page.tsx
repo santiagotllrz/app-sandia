@@ -140,8 +140,6 @@ export default async function PaginaNoticia({ params }: Props) {
             </div>
           </header>
 
-          {d.fuentes.length > 0 && <FilaFuentes fuentes={fuentesOrdenadas} />}
-
           <figure className="mt-6">
             <ImagenNoticia
               src={n.imagen}
@@ -162,6 +160,8 @@ export default async function PaginaNoticia({ params }: Props) {
               </figcaption>
             )}
           </figure>
+
+          {d.fuentes.length > 0 && <FilaFuentes fuentes={fuentesOrdenadas} />}
 
           <div className="cuerpo-noticia mt-8">
             <Parrafos parrafos={d.entrada.parrafos} fuentes={fuentesDe(d.entrada.fuentes)} />

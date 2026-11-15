@@ -3,7 +3,7 @@
 /* Tokens de color: solo blanco, negro y grises neutros. Se cambian aquí y todo el portal los toma.
    El "acento" es un gris medio: se usa para el hover de titulares y los detalles de énfasis. */
 :root {
-  --bg-base: #fafafa;
+  --bg-base: #ffffff;
   --bg-raised: #ffffff;
   --bg-subtle: rgb(0 0 0 / 0.035);
   --bg-soft: rgb(0 0 0 / 0.06);
@@ -19,27 +19,6 @@
   --negativo: #dc2626;
   --shadow-hover: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px -6px rgb(0 0 0 / 0.12);
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-base: #121212;
-    --bg-raised: #1b1b1b;
-    --bg-subtle: rgb(255 255 255 / 0.035);
-    --bg-soft: rgb(255 255 255 / 0.07);
-    --bg-inverse: #ededed;
-    --fg-primary: #ededed;
-    --fg-secondary: rgb(237 237 237 / 0.64);
-    --fg-tertiary: rgb(237 237 237 / 0.46);
-    --border-soft: rgb(255 255 255 / 0.08);
-    --border-base: rgb(255 255 255 / 0.15);
-    --accent: #b3b3b3;
-    --accent-soft: rgb(255 255 255 / 0.08);
-    --positivo: #4ade80;
-    --negativo: #f87171;
-    --shadow-hover: 0 0 0 1px rgb(255 255 255 / 0.06), 0 8px 24px -8px rgb(0 0 0 / 0.6);
-    color-scheme: dark;
-  }
 }
 
 @theme inline {

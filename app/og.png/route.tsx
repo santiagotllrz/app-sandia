@@ -21,11 +21,11 @@ export async function GET() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 80,
-          background: "#fafafa",
+          background: "#ffffff",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} width={434} height={141} alt="" />
+        <img src={src} width={294} height={141} alt="" />
         <div style={{ fontSize: 44, lineHeight: 1.25, maxWidth: 980, color: "rgba(23,23,23,.64)" }}>{sitio.descripcion}</div>
       </div>
     ),
