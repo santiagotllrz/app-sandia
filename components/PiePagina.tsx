@@ -50,9 +50,20 @@ export function PiePagina({ temas }: { temas: Tema[] }) {
         </nav>
       </div>
       <div className="border-t border-borde">
-        <p className="mx-auto max-w-[1240px] px-4 py-4 text-xs text-tertiary md:px-8">
-          © {new Date().getFullYear()} {sitio.nombre}. Cada noticia enlaza a sus fuentes originales.
-        </p>
+        <div className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 px-4 py-4 text-xs text-tertiary md:px-8">
+          <p>© {new Date().getFullYear()} {sitio.nombre}. Cada noticia enlaza a sus fuentes originales.</p>
+          <nav aria-label="Información editorial" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href={rutas.nosotros()} className="hover:text-primary">
+              Sobre nosotros y metodología
+            </Link>
+            <Link href={`${rutas.nosotros()}#correcciones`} className="hover:text-primary">
+              Política de correcciones
+            </Link>
+            <Link href={`${rutas.nosotros()}#contacto`} className="hover:text-primary">
+              Contacto
+            </Link>
+          </nav>
+        </div>
       </div>
     </footer>
   )

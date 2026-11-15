@@ -8,7 +8,7 @@ export const revalidate = 900
 // Sitemap general: listados, temas con noticias y hasta 45.000 noticias (límite de 50.000 URLs por archivo).
 export async function GET() {
   const db = await almacen()
-  const [noticias, temas] = await Promise.all([db.todas(45_000), db.temas()])
+  const [noticias, temas, etiquetas] = await Promise.all([db.todas(40_000), db.temas(), db.etiquetasIndexables(2)])
   const ultima = noticias[0]?.actualizada_at
   const temasConNoticias = new Set(noticias.map((n) => n.tema_slug))
 
@@ -29,11 +29,15 @@ export async function GET() {
     url(urlAbsoluta("/"), ultima, "hourly", 1),
     url(urlAbsoluta(rutas.destacados()), ultima, "hourly", 0.8),
     url(urlAbsoluta(rutas.temas()), undefined, "daily", 0.6),
+    url(urlAbsoluta(rutas.nosotros()), undefined, "monthly", 0.5),
     ...temas
       .filter((t) => temasConNoticias.has(t.slug))
       .map((t) =>
         url(urlAbsoluta(rutas.tema(t.slug)), noticias.find((n) => n.tema_slug === t.slug)?.actualizada_at, "hourly", 0.7),
       ),
+    ...etiquetas
+      .slice(0, 5_000)
+      .map((e) => url(urlAbsoluta(rutas.etiqueta(e.etiqueta)), e.ultima, "daily", 0.5)),
     ...noticias.map((n) => url(urlAbsoluta(rutas.noticia(n.slug)), n.actualizada_at, "weekly", 0.6, n.imagen)),
   ]
 

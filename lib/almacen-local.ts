@@ -77,8 +77,11 @@ export function almacenLocal(): Almacen {
       return (await leer()).temas.sort((a, b) => a.orden - b.orden).map(({ slug, nombre }) => ({ slug, nombre }))
     },
 
-    async listar({ tema, pagina, porPagina }) {
-      const todas = publicadas(await leer()).filter((n) => !tema || n.tema_slug === tema)
+    async listar({ tema, etiqueta, pagina, porPagina }) {
+      const etq = etiqueta?.trim().toLowerCase()
+      const todas = publicadas(await leer()).filter(
+        (n) => (!tema || n.tema_slug === tema) && (!etq || n.etiquetas.some((e) => e.toLowerCase() === etq)),
+      )
       const desde = (pagina - 1) * porPagina
       return { items: todas.slice(desde, desde + porPagina).map(aResumen), total: todas.length }
     },
@@ -89,6 +92,38 @@ export function almacenLocal(): Almacen {
       const todas = publicadas(await leer()).sort((a, b) => suma(b) - suma(a))
       const desde = (pagina - 1) * porPagina
       return { items: todas.slice(desde, desde + porPagina).map(aResumen), total: todas.length }
+    },
+
+    async relacionadas({ id, tema, etiquetas, limite = 9 }) {
+      const setEtq = new Set(etiquetas.map((e) => e.toLowerCase()))
+      const candidatas = publicadas(await leer()).filter((n) => n.id !== id)
+      const puntos = (n: Fila) => {
+        const comunes = n.etiquetas.filter((e) => setEtq.has(e.toLowerCase())).length
+        return comunes * 10 + (tema && n.tema_slug === tema ? 1 : 0)
+      }
+      return candidatas
+        .sort((a, b) => puntos(b) - puntos(a) || b.publicada_at.localeCompare(a.publicada_at))
+        .slice(0, limite)
+        .map(aResumen)
+    },
+
+    async etiquetasIndexables(minNoticias = 2) {
+      const conteo = new Map<string, { total: number; ultima: string }>()
+      for (const n of publicadas(await leer())) {
+        for (const raw of n.etiquetas) {
+          const e = raw.trim()
+          if (!e) continue
+          const prev = conteo.get(e)
+          if (!prev) conteo.set(e, { total: 1, ultima: n.actualizada_at })
+          else {
+            prev.total += 1
+            if (n.actualizada_at > prev.ultima) prev.ultima = n.actualizada_at
+          }
+        }
+      }
+      return [...conteo.entries()]
+        .filter(([, v]) => v.total >= minNoticias)
+        .map(([etiqueta, v]) => ({ etiqueta, ultima: v.ultima }))
     },
 
     async porSlug(slug) {
@@ -200,6 +235,8 @@ export function almacenVacio(): Almacen {
     temas: async () => TEMAS_INICIALES.map(([slug, nombre]) => ({ slug, nombre })),
     listar: async () => ({ items: [], total: 0 }),
     destacados: async () => ({ items: [], total: 0 }),
+    relacionadas: async () => [],
+    etiquetasIndexables: async () => [],
     porSlug: async () => null,
     todas: async () => [],
     eventoYaProcesado: sinDb,

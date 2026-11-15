@@ -16,6 +16,7 @@ export const sitio = {
   climaPorDefecto: { ciudad: "Bogotá", lat: 4.711, lon: -74.0721 },
   // A dónde lleva el botón de alertas de la página de enlaces (NEXT_PUBLIC_ALERTAS_URL lo cambia).
   alertasUrl: process.env.NEXT_PUBLIC_ALERTAS_URL || "https://usesandia.com",
+  contacto: process.env.NEXT_PUBLIC_CONTACTO_EMAIL || "contacto@usesandia.com",
   redes: {
     instagram: "https://www.instagram.com/indiceagro.co",
     facebook: "https://www.facebook.com/people/%C3%8Dndice-Agro/61593986745138/",
@@ -37,6 +38,13 @@ export const rutas = {
   destacados: (pagina = 1) => (pagina > 1 ? `/destacados/pagina/${pagina}` : "/destacados"),
   temas: () => "/temas",
   tema: (slug: string, pagina = 1) => (pagina > 1 ? `/temas/${slug}/pagina/${pagina}` : `/temas/${slug}`),
+  rssTema: (slug: string) => `/temas/${slug}/rss.xml`,
+  etiqueta: (etiqueta: string, pagina = 1) => {
+    const enc = encodeURIComponent(etiqueta.trim())
+    return pagina > 1 ? `/etiquetas/${enc}/pagina/${pagina}` : `/etiquetas/${enc}`
+  },
   noticia: (slug: string) => `/noticias/${slug}`,
+  ogNoticia: (slug: string) => `/noticias/${slug}/og.png`,
+  nosotros: () => "/nosotros",
   enlaces: () => "/enlaces",
 }

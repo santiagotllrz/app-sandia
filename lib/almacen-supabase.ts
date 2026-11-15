@@ -36,10 +36,11 @@ export function almacenSupabase(): Almacen {
       return data ?? []
     },
 
-    async listar({ tema, pagina, porPagina }) {
+    async listar({ tema, etiqueta, pagina, porPagina }) {
       const [desde, hasta] = rango(pagina, porPagina)
       let q = db.from("noticias").select(COLUMNAS_RESUMEN, { count: "exact" }).eq("estado", "publicada")
       if (tema) q = q.eq("tema_slug", tema)
+      if (etiqueta) q = q.contains("etiquetas", [etiqueta])
       const { data, error, count } = await q.order("publicada_at", { ascending: false }).range(desde, hasta)
       falla("listar", error)
       return { items: (data as FilaResumen[] | null ?? []).map(aResumen), total: count ?? 0 }
@@ -58,6 +59,92 @@ export function almacenSupabase(): Almacen {
       falla("destacados", error)
       const porId = new Map((data as FilaResumen[]).map((f) => [f.id, aResumen(f)]))
       return { items: ids.map((id) => porId.get(id)).filter((n): n is NoticiaResumen => !!n), total: conteo.count ?? 0 }
+    },
+
+    async relacionadas({ id, tema, etiquetas, limite = 9 }) {
+      const setEtq = new Set(etiquetas.map((e) => e.toLowerCase()))
+      const [porEtiqueta, delTema, recientes] = await Promise.all([
+        etiquetas.length
+          ? db
+              .from("noticias")
+              .select(`${COLUMNAS_RESUMEN},etiquetas`)
+              .eq("estado", "publicada")
+              .neq("id", id)
+              .overlaps("etiquetas", etiquetas)
+              .order("publicada_at", { ascending: false })
+              .limit(limite * 2)
+          : Promise.resolve({ data: [], error: null }),
+        tema
+          ? db
+              .from("noticias")
+              .select(COLUMNAS_RESUMEN)
+              .eq("estado", "publicada")
+              .eq("tema_slug", tema)
+              .neq("id", id)
+              .order("publicada_at", { ascending: false })
+              .limit(limite)
+          : Promise.resolve({ data: [], error: null }),
+        db
+          .from("noticias")
+          .select(COLUMNAS_RESUMEN)
+          .eq("estado", "publicada")
+          .neq("id", id)
+          .order("publicada_at", { ascending: false })
+          .limit(limite),
+      ])
+      falla("relacionadas:etiquetas", porEtiqueta.error)
+      falla("relacionadas:tema", delTema.error)
+      falla("relacionadas:recientes", recientes.error)
+
+      const conEtiqueta = ((porEtiqueta.data ?? []) as (FilaResumen & { etiquetas?: string[] })[])
+        .sort((a, b) => {
+          const ca = (a.etiquetas ?? []).filter((e) => setEtq.has(e.toLowerCase())).length
+          const cb = (b.etiquetas ?? []).filter((e) => setEtq.has(e.toLowerCase())).length
+          return cb - ca || b.publicada_at.localeCompare(a.publicada_at)
+        })
+        .map(({ etiquetas: _e, ...f }) => aResumen(f))
+
+      const vistos = new Set<string>([id])
+      const unicas: NoticiaResumen[] = []
+      for (const n of [
+        ...conEtiqueta,
+        ...((delTema.data ?? []) as FilaResumen[]).map(aResumen),
+        ...((recientes.data ?? []) as FilaResumen[]).map(aResumen),
+      ]) {
+        if (!vistos.has(n.id)) {
+          vistos.add(n.id)
+          unicas.push(n)
+          if (unicas.length >= limite) break
+        }
+      }
+      return unicas
+    },
+
+    async etiquetasIndexables(minNoticias = 2) {
+      const { data, error } = await db
+        .from("noticias")
+        .select("etiquetas,actualizada_at")
+        .eq("estado", "publicada")
+        .not("etiquetas", "eq", "{}")
+        .order("publicada_at", { ascending: false })
+        .limit(5000)
+      falla("etiquetasIndexables", error)
+      const conteo = new Map<string, { total: number; ultima: string }>()
+      for (const f of (data ?? []) as { etiquetas: string[]; actualizada_at: string }[]) {
+        for (const raw of f.etiquetas ?? []) {
+          const e = raw.trim()
+          if (!e) continue
+          const prev = conteo.get(e)
+          if (!prev) conteo.set(e, { total: 1, ultima: f.actualizada_at })
+          else {
+            prev.total += 1
+            if (f.actualizada_at > prev.ultima) prev.ultima = f.actualizada_at
+          }
+        }
+      }
+      return [...conteo.entries()]
+        .filter(([, v]) => v.total >= minNoticias)
+        .map(([etiqueta, v]) => ({ etiqueta, ultima: v.ultima }))
     },
 
     async porSlug(slug) {

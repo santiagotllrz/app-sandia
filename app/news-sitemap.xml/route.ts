@@ -10,7 +10,8 @@ export async function GET() {
   const noticias = (await (await almacen()).todas(1000)).filter((n) => new Date(n.publicada_at).getTime() >= limite)
 
   const urls = noticias.map((n) => {
-    const imagen = n.imagen ? `\n    <image:image><image:loc>${escaparXml(n.imagen)}</image:loc></image:image>` : ""
+    const imgUrl = n.imagen ?? urlAbsoluta(rutas.ogNoticia(n.slug))
+    const imagen = `\n    <image:image><image:loc>${escaparXml(imgUrl)}</image:loc></image:image>`
     return `  <url>
     <loc>${escaparXml(urlAbsoluta(rutas.noticia(n.slug)))}</loc>
     <lastmod>${n.actualizada_at}</lastmod>

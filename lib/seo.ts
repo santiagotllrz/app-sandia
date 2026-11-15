@@ -14,11 +14,21 @@ export function jsonLdOrganizacion() {
     "@type": "NewsMediaOrganization",
     "@id": ID_ORG,
     name: sitio.nombre,
+    description: sitio.descripcion,
     url: urlAbsoluta("/"),
     logo: { "@type": "ImageObject", url: urlAbsoluta("/logo.svg"), width: 724, height: 236 },
     areaServed: { "@type": "Country", name: "Colombia" },
     knowsLanguage: sitio.idioma,
     sameAs: Object.values(sitio.redes),
+    publishingPrinciples: urlAbsoluta(`${rutas.nosotros()}#metodologia`),
+    correctionsPolicy: urlAbsoluta(`${rutas.nosotros()}#correcciones`),
+    actionableFeedbackPolicy: urlAbsoluta(`${rutas.nosotros()}#contacto`),
+    contactPoint: {
+      "@type": "ContactPoint",
+      email: sitio.contacto,
+      contactType: "editorial",
+      availableLanguage: [sitio.idioma, "es"],
+    },
   }
 }
 
@@ -48,7 +58,17 @@ export function jsonLdMigas(items: { nombre: string; ruta: string }[]) {
   }
 }
 
-export function jsonLdColeccion({ nombre, descripcion, ruta, noticias }: { nombre: string; descripcion: string; ruta: string; noticias: NoticiaResumen[] }) {
+export function jsonLdColeccion({
+  nombre,
+  descripcion,
+  ruta,
+  noticias,
+}: {
+  nombre: string
+  descripcion: string
+  ruta: string
+  noticias: NoticiaResumen[]
+}) {
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -64,10 +84,46 @@ export function jsonLdColeccion({ nombre, descripcion, ruta, noticias }: { nombr
   }
 }
 
+function cuerpoTextoPlano(n: NoticiaCompleta) {
+  const bloques: string[] = [...(n.datos.entrada?.parrafos ?? [])]
+  for (const s of n.datos.secciones ?? []) {
+    if (s.subtitulo) bloques.push(s.subtitulo)
+    bloques.push(...(s.parrafos ?? []))
+  }
+  return bloques.join("\n\n").trim()
+}
+
 export function jsonLdNoticia(n: NoticiaCompleta, temaNombre: string | null) {
   const url = urlAbsoluta(rutas.noticia(n.slug))
   const d = n.datos
-  const credito = d.imagen?.credito
+  const ogPropia = {
+    "@type": "ImageObject",
+    url: urlAbsoluta(rutas.ogNoticia(n.slug)),
+    width: 1200,
+    height: 630,
+    caption: n.titular,
+    ...metadatosImagen(undefined, url),
+  }
+  const imagenes = n.imagen
+    ? [
+        {
+          "@type": "ImageObject",
+          url: n.imagen,
+          width: n.imagen_ancho ?? undefined,
+          height: n.imagen_alto ?? undefined,
+          caption: n.imagen_alt ?? n.titular,
+          ...metadatosImagen(d.imagen?.credito, url),
+        },
+        ...(!n.imagen_ancho || n.imagen_ancho < 1200 ? [ogPropia] : []),
+      ]
+    : [ogPropia]
+
+  const entidades = [
+    ...(temaNombre ? [{ "@type": "Thing", name: temaNombre, url: n.tema_slug ? urlAbsoluta(rutas.tema(n.tema_slug)) : undefined }] : []),
+    ...n.etiquetas.map((e) => ({ "@type": "Thing", name: e, url: urlAbsoluta(rutas.etiqueta(e)) })),
+  ]
+  const articleBody = cuerpoTextoPlano(n)
+
   return {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -77,26 +133,18 @@ export function jsonLdNoticia(n: NoticiaCompleta, temaNombre: string | null) {
     headline: n.titular.length > 110 ? `${n.titular.slice(0, 107).trimEnd()}…` : n.titular,
     alternativeHeadline: n.titular.length > 110 ? n.titular : undefined,
     description: descripcionMeta(d),
+    articleBody: articleBody || undefined,
     inLanguage: d.idioma ?? sitio.idioma,
+    isAccessibleForFree: true,
     datePublished: n.publicada_at,
     dateModified: n.actualizada_at,
     articleSection: temaNombre ?? undefined,
     keywords: n.etiquetas.length ? n.etiquetas.join(", ") : undefined,
+    about: entidades.length ? entidades : undefined,
     wordCount: n.palabras ?? undefined,
     timeRequired: n.minutos_lectura ? `PT${n.minutos_lectura}M` : undefined,
-    image: n.imagen
-      ? [
-          {
-            "@type": "ImageObject",
-            url: n.imagen,
-            width: n.imagen_ancho ?? undefined,
-            height: n.imagen_alto ?? undefined,
-            caption: n.imagen_alt ?? undefined,
-            ...metadatosImagen(d.imagen?.credito, url),
-          },
-        ]
-      : undefined,
-    author: { "@type": "Organization", "@id": ID_ORG, name: sitio.nombre, url: urlAbsoluta("/") },
+    image: imagenes,
+    author: { "@type": "NewsMediaOrganization", "@id": ID_ORG, name: sitio.nombre, url: urlAbsoluta("/") },
     publisher: { "@id": ID_ORG },
     isPartOf: { "@id": ID_SITIO },
     citation: d.fuentes.map((f) => ({
@@ -132,26 +180,40 @@ function metadatosImagen(
   }
 }
 
-/** Metadatos de un listado (inicio, destacados, tema) con canonical y su paginación. */
+/** Metadatos de un listado (inicio, destacados, tema, etiqueta) con canonical y control de paginación. */
 export function metadatosListado({
   titulo,
   descripcion,
   ruta,
   pagina = 1,
   tituloAbsoluto = false,
+  rss,
 }: {
   titulo: string
   descripcion: string
   ruta: string
   pagina?: number
   tituloAbsoluto?: boolean
+  rss?: { url: string; titulo: string }
 }): Metadata {
   const tituloFinal = pagina > 1 ? `${titulo} · Página ${pagina}` : titulo
   return {
     title: tituloAbsoluto && pagina === 1 ? { absolute: tituloFinal } : tituloFinal,
     description: descripcion,
-    alternates: { canonical: ruta },
-    openGraph: { type: "website", url: ruta, title: tituloFinal, description: descripcion, siteName: sitio.nombre, locale: sitio.locale, images: [IMAGEN_OG] },
+    alternates: {
+      canonical: ruta,
+      ...(rss ? { types: { "application/rss+xml": [{ url: rss.url, title: rss.titulo }] } } : {}),
+    },
+    ...(pagina > 1 ? { robots: { index: false, follow: true } } : {}),
+    openGraph: {
+      type: "website",
+      url: ruta,
+      title: tituloFinal,
+      description: descripcion,
+      siteName: sitio.nombre,
+      locale: sitio.locale,
+      images: [IMAGEN_OG],
+    },
     twitter: { card: "summary_large_image", title: tituloFinal, description: descripcion, images: [IMAGEN_OG.url] },
   }
 }

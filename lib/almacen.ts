@@ -27,8 +27,10 @@ export interface RegistroEvento {
 /** Acceso a datos. Producción usa Supabase; en desarrollo sin credenciales, un archivo JSON local. */
 export interface Almacen {
   temas(): Promise<Tema[]>
-  listar(opts: { tema?: string; pagina: number; porPagina: number }): Promise<Pagina<NoticiaResumen>>
+  listar(opts: { tema?: string; etiqueta?: string; pagina: number; porPagina: number }): Promise<Pagina<NoticiaResumen>>
   destacados(opts: { pagina: number; porPagina: number; dias?: number }): Promise<Pagina<NoticiaResumen>>
+  relacionadas(opts: { id: string; tema: string | null; etiquetas: string[]; limite?: number }): Promise<NoticiaResumen[]>
+  etiquetasIndexables(minNoticias?: number): Promise<{ etiqueta: string; ultima: string }[]>
   porSlug(slug: string): Promise<NoticiaCompleta | null>
   todas(limite: number): Promise<NoticiaResumen[]>
 

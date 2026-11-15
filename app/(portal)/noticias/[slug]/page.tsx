@@ -14,7 +14,7 @@ import { almacen } from "@/lib/almacen"
 import { rutas, sitio, urlAbsoluta } from "@/lib/config"
 import { descripcionMeta, dominio, favicon, formatoFechaCorta, formatoFechaLarga } from "@/lib/formato"
 import { IMAGEN_OG, jsonLdMigas, jsonLdNoticia } from "@/lib/seo"
-import type { Fuente, NoticiaResumen } from "@/lib/tipos"
+import type { Fuente } from "@/lib/tipos"
 
 export const revalidate = 3600
 
@@ -42,9 +42,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { noticia: n, tema } = datos
   const ruta = rutas.noticia(n.slug)
   const description = descripcionMeta(n.datos)
+  const ogNoticia = { url: rutas.ogNoticia(n.slug), width: 1200, height: 630, alt: n.titular }
   const imagen = n.imagen
-    ? [{ url: n.imagen, width: n.imagen_ancho ?? undefined, height: n.imagen_alto ?? undefined, alt: n.imagen_alt ?? n.titular }]
-    : [IMAGEN_OG]
+    ? [
+        { url: n.imagen, width: n.imagen_ancho ?? undefined, height: n.imagen_alto ?? undefined, alt: n.imagen_alt ?? n.titular },
+        ...(!n.imagen_ancho || n.imagen_ancho < 1200 ? [ogNoticia] : []),
+      ]
+    : [ogNoticia, IMAGEN_OG]
   return {
     title: n.titular,
     description,
@@ -63,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       tags: n.etiquetas,
       images: imagen,
     },
-    twitter: { card: "summary_large_image", title: n.titular, description, images: imagen.map((i) => i.url) },
+    twitter: { card: "summary_large_image", title: n.titular, description, images: [imagen[0].url] },
   }
 }
 
@@ -77,7 +81,12 @@ export default async function PaginaNoticia({ params }: Props) {
   const fuentesOrdenadas = [...d.fuentes].sort((a, b) => Number(!!b.principal) - Number(!!a.principal))
   const actualizada = new Date(n.actualizada_at).getTime() - new Date(n.publicada_at).getTime() > 10 * 60_000
 
-  const relacionadas = await masNoticias(n.id, n.tema_slug)
+  const relacionadas = await (await almacen()).relacionadas({
+    id: n.id,
+    tema: n.tema_slug,
+    etiquetas: n.etiquetas,
+    limite: 9,
+  })
 
   return (
     <div className="mx-auto my-4 w-full max-w-[1240px] px-4 md:my-8 md:px-8">
@@ -166,8 +175,13 @@ export default async function PaginaNoticia({ params }: Props) {
           {n.etiquetas.length > 0 && (
             <ul className="mt-8 flex flex-wrap gap-2" aria-label="Etiquetas">
               {n.etiquetas.map((e) => (
-                <li key={e} className="rounded-full bg-subtle px-3 py-1 text-xs text-secondary">
-                  {e}
+                <li key={e}>
+                  <Link
+                    href={rutas.etiqueta(e)}
+                    className="inline-block rounded-full bg-subtle px-3 py-1 text-xs text-secondary transition-colors hover:bg-soft hover:text-primary"
+                  >
+                    {e}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -226,17 +240,6 @@ export default async function PaginaNoticia({ params }: Props) {
       />
     </div>
   )
-}
-
-/** Del mismo tema primero; si no alcanzan, completa con las más recientes. */
-async function masNoticias(id: string, tema: string | null): Promise<NoticiaResumen[]> {
-  const db = await almacen()
-  const [delTema, recientes] = await Promise.all([
-    tema ? db.listar({ tema, pagina: 1, porPagina: 10 }) : Promise.resolve({ items: [], total: 0 }),
-    db.listar({ pagina: 1, porPagina: 10 }),
-  ])
-  const vistos = new Set([id])
-  return [...delTema.items, ...recientes.items].filter((n) => !vistos.has(n.id) && !!vistos.add(n.id)).slice(0, 9)
 }
 
 function FilaFuentes({ fuentes }: { fuentes: Fuente[] }) {

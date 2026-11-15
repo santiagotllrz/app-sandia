@@ -88,9 +88,15 @@ export async function metadatosTema(slug: string, pagina: number) {
   if (!tema) return {}
   const { total } = await (await almacen()).listar({ tema: slug, pagina: 1, porPagina: 1 })
   return {
-    ...metadatosListado({ titulo: tema.nombre, descripcion: descripcionTema(tema.nombre), ruta: rutas.tema(slug, pagina), pagina }),
-    // Un tema sin noticias es una página vacía: no se indexa hasta que tenga.
-    ...(total === 0 ? { robots: { index: false, follow: true } } : {}),
+    ...metadatosListado({
+      titulo: tema.nombre,
+      descripcion: descripcionTema(tema.nombre),
+      ruta: rutas.tema(slug, pagina),
+      pagina,
+      rss: { url: rutas.rssTema(slug), titulo: `${tema.nombre} | ${sitio.nombre} (RSS)` },
+    }),
+    // Un tema sin noticias o una página de archivo > 1 no se indexa (pero se siguen sus enlaces).
+    ...(total === 0 || pagina > 1 ? { robots: { index: false, follow: true } } : {}),
   }
 }
 
@@ -128,6 +134,82 @@ export async function VistaTema({ slug, pagina }: { slug: string; pagina: number
             { nombre: "Inicio", ruta: "/" },
             { nombre: "Temas", ruta: rutas.temas() },
             { nombre: tema.nombre, ruta: rutas.tema(slug) },
+          ]),
+        ]}
+      />
+    </>
+  )
+}
+
+// ── Etiqueta (entidad / palabra clave) ──
+export function decodificarEtiqueta(raw: string) {
+  try {
+    return decodeURIComponent(raw).trim()
+  } catch {
+    return raw.trim()
+  }
+}
+
+const capitalizar = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s)
+const descripcionEtiqueta = (etiqueta: string) =>
+  `Noticias y seguimiento sobre ${etiqueta} en el agro colombiano, con sus fuentes originales.`
+
+export async function metadatosEtiqueta(raw: string, pagina: number) {
+  const etiqueta = decodificarEtiqueta(raw)
+  if (!etiqueta) return {}
+  const { total } = await (await almacen()).listar({ etiqueta, pagina: 1, porPagina: 1 })
+  if (total === 0) return { title: "Etiqueta no encontrada", robots: { index: false } }
+  const titulo = capitalizar(etiqueta)
+  return {
+    ...metadatosListado({
+      titulo,
+      descripcion: descripcionEtiqueta(etiqueta),
+      ruta: rutas.etiqueta(etiqueta, pagina),
+      pagina,
+    }),
+    // Solo se indexan clústeres con al menos 2 noticias en su página 1 para evitar thin content.
+    ...(total < 2 || pagina > 1 ? { robots: { index: false, follow: true } } : {}),
+  }
+}
+
+export async function VistaEtiqueta({ etiqueta: raw, pagina }: { etiqueta: string; pagina: number }) {
+  const etiqueta = decodificarEtiqueta(raw)
+  if (!etiqueta) notFound()
+  const { items, total } = await (await almacen()).listar({ etiqueta, pagina, porPagina: POR_PAGINA })
+  if (!items.length) notFound()
+  const titulo = capitalizar(etiqueta)
+  return (
+    <>
+      <Listado
+        encabezado={
+          <>
+            <nav aria-label="Ruta de navegación" className="mb-2 text-xs font-medium text-secondary">
+              <Link href="/" className="hover:text-primary">
+                Inicio
+              </Link>
+            </nav>
+            <TituloListado
+              titulo={pagina > 1 ? `${titulo}, página ${pagina}` : titulo}
+              descripcion={descripcionEtiqueta(etiqueta)}
+            />
+          </>
+        }
+        noticias={items}
+        pagina={pagina}
+        totalPaginas={totalPaginas(total)}
+        rutaPagina={(n) => rutas.etiqueta(etiqueta, n)}
+      />
+      <JsonLd
+        datos={[
+          jsonLdColeccion({
+            nombre: titulo,
+            descripcion: descripcionEtiqueta(etiqueta),
+            ruta: rutas.etiqueta(etiqueta, pagina),
+            noticias: items,
+          }),
+          jsonLdMigas([
+            { nombre: "Inicio", ruta: "/" },
+            { nombre: titulo, ruta: rutas.etiqueta(etiqueta) },
           ]),
         ]}
       />
