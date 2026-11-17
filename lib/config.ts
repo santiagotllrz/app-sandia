@@ -10,7 +10,7 @@ export const sitio = {
   // desde un dominio *.vercel.app. NEXT_PUBLIC_SITE_URL solo hace falta para cambiarlo.
   url: (
     process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.NODE_ENV === "production" ? "https://app.usesandia.com" : "http://localhost:3000")
+    (process.env.NODE_ENV === "production" ? "https://indiceagro.co" : "http://localhost:3000")
   ).replace(/\/$/, ""),
   // Ubicación por defecto del widget de clima cuando no se conoce la del visitante.
   climaPorDefecto: { ciudad: "Bogotá", lat: 4.711, lon: -74.0721 },
