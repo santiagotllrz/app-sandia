@@ -40,6 +40,8 @@ export interface Almacen {
   retirarNoticia(id: string, version: number | null, motivo: string | null): Promise<ResultadoRetiro>
   registrarVista(id: string): Promise<void>
   copiarImagen(id: string, version: number, url: string): Promise<void>
+  /** Recomprime a WebP un lote de noticias cuyas imágenes propias aún estén en JPG/PNG. */
+  optimizarImagenesExistentes(limite?: number): Promise<{ procesadas: number; pendientes: number; ahorradoBytes: number }>
   /** Copia la portada al storage propio y la asocia a la noticia. "no_existe" si la noticia aún no llegó. */
   guardarPortada(id: string, portada: PortadaPayload): Promise<"guardada" | "no_existe">
   /** Las portadas de la página de enlaces, la más reciente primero, desde la posición `desde`. */

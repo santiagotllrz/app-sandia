@@ -1,10 +1,32 @@
 import "server-only"
 import { createClient } from "@supabase/supabase-js"
+import sharp from "sharp"
 import type { Almacen, ResultadoRetiro, ResultadoUpsert } from "./almacen"
 import type { NoticiaCompleta, NoticiaResumen, PortadaEnlace } from "./tipos"
 
 /** Las portadas llegan ya comprimidas (unos 40 KB); esto solo frena algo raro. */
 const MAX_PORTADA_BYTES = 2 * 1024 * 1024
+/** Ancho máximo al que se muestra una imagen en el portal (720px en artículo, ~960px con holgura retina). */
+const MAX_IMAGEN_ANCHO = 960
+const CALIDAD_WEBP = 72
+
+/** Comprime la imagen a WebP liviano para ahorrar almacenamiento y ancho de banda en Supabase. */
+async function comprimirImagen(entrada: Buffer, tipoOriginal: string) {
+  try {
+    const { data, info } = await sharp(entrada)
+      .rotate()
+      .resize({ width: MAX_IMAGEN_ANCHO, height: MAX_IMAGEN_ANCHO, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: CALIDAD_WEBP, effort: 4 })
+      .toBuffer({ resolveWithObject: true })
+    if (data.byteLength < entrada.byteLength) {
+      return { bytes: data, tipo: "image/webp", ext: "webp" as const, ancho: info.width, alto: info.height }
+    }
+  } catch (e) {
+    console.warn("[imagen] no se pudo recomprimir con sharp; se guarda el original", e)
+  }
+  const ext = tipoOriginal === "image/png" ? "png" : tipoOriginal === "image/webp" ? "webp" : "jpg"
+  return { bytes: entrada, tipo: tipoOriginal, ext, ancho: null, alto: null }
+}
 
 const COLUMNAS_RESUMEN =
   "id,slug,titular,resumen,tema_slug,imagen_url,imagen_url_propia,imagen_ancho,imagen_alto,imagen_alt,fuentes_total,fuentes_dominios,publicada_at,actualizada_at"
@@ -204,17 +226,80 @@ export function almacenSupabase(): Almacen {
     async copiarImagen(id, version, url) {
       const res = await fetch(url, { signal: AbortSignal.timeout(20_000) })
       if (!res.ok) throw new Error(`descarga ${res.status}`)
-      const tipo = res.headers.get("content-type")?.split(";")[0] ?? "image/jpeg"
-      const ext = tipo === "image/png" ? "png" : tipo === "image/webp" ? "webp" : "jpg"
+      const tipoOriginal = res.headers.get("content-type")?.split(";")[0] ?? "image/jpeg"
+      const original = Buffer.from(await res.arrayBuffer())
+      const { bytes, tipo, ext } = await comprimirImagen(original, tipoOriginal)
       const ruta = `${id}/v${version}.${ext}`
       const { error } = await db.storage
         .from("noticias")
-        .upload(ruta, await res.arrayBuffer(), { contentType: tipo, upsert: true, cacheControl: "31536000" })
+        .upload(ruta, bytes, { contentType: tipo, upsert: true, cacheControl: "31536000" })
       falla("storage", error)
       const publica = db.storage.from("noticias").getPublicUrl(ruta).data.publicUrl
       // Solo si la noticia sigue apuntando a esa imagen (no llegó otra versión mientras tanto).
       const upd = await db.from("noticias").update({ imagen_url_propia: publica }).eq("id", id).eq("imagen_url", url)
       falla("imagen_url_propia", upd.error)
+    },
+
+    async optimizarImagenesExistentes(limite = 25) {
+      const { data, error, count } = await db
+        .from("noticias")
+        .select("id,version,imagen_url,imagen_url_propia", { count: "exact" })
+        .not("imagen_url", "is", null)
+        .or("imagen_url_propia.is.null,imagen_url_propia.not.ilike.%.webp")
+        .order("publicada_at", { ascending: false })
+        .limit(limite)
+      falla("optimizarImagenesExistentes", error)
+
+      const filas = (data ?? []) as { id: string; version: number; imagen_url: string; imagen_url_propia: string | null }[]
+      let procesadas = 0
+      let ahorradoBytes = 0
+
+      for (const f of filas) {
+        const origen = f.imagen_url_propia ?? f.imagen_url
+        try {
+          const res = await fetch(origen, { signal: AbortSignal.timeout(20_000) })
+          if (!res.ok) continue
+          const original = Buffer.from(await res.arrayBuffer())
+          const { data: comprimida } = await sharp(original)
+            .rotate()
+            .resize({ width: MAX_IMAGEN_ANCHO, height: MAX_IMAGEN_ANCHO, fit: "inside", withoutEnlargement: true })
+            .webp({ quality: CALIDAD_WEBP, effort: 4 })
+            .toBuffer({ resolveWithObject: true })
+
+          const rutaWebp = `${f.id}/v${f.version}.webp`
+          const { error: errSubida } = await db.storage
+            .from("noticias")
+            .upload(rutaWebp, comprimida, { contentType: "image/webp", upsert: true, cacheControl: "31536000" })
+          if (errSubida) continue
+
+          const publica = db.storage.from("noticias").getPublicUrl(rutaWebp).data.publicUrl
+          const { error: errUpd } = await db.from("noticias").update({ imagen_url_propia: publica }).eq("id", f.id)
+          if (errUpd) continue
+
+          if (f.imagen_url_propia && !f.imagen_url_propia.endsWith(".webp")) {
+            const marcador = "/storage/v1/object/public/noticias/"
+            const idx = f.imagen_url_propia.indexOf(marcador)
+            if (idx !== -1) {
+              const rutaVieja = f.imagen_url_propia.slice(idx + marcador.length)
+              if (rutaVieja && rutaVieja !== rutaWebp) {
+                await db.storage.from("noticias").remove([rutaVieja])
+              }
+            }
+          }
+
+          procesadas += 1
+          ahorradoBytes += Math.max(0, original.byteLength - comprimida.byteLength)
+        } catch (e) {
+          console.warn("[optimizarImagenesExistentes] fallo en noticia", f.id, e)
+        }
+      }
+
+      const totalPendientes = count ?? filas.length
+      return {
+        procesadas,
+        pendientes: Math.max(0, totalPendientes - procesadas),
+        ahorradoBytes,
+      }
     },
 
     async guardarPortada(id, portada) {

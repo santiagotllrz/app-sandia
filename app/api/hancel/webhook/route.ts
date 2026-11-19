@@ -66,6 +66,13 @@ export async function POST(req: Request) {
       return json({ ok: true, duplicado: true, ...(slug && tipo !== "noticia.retirada" ? { url: urlAbsoluta(rutas.noticia(slug)) } : {}) })
     }
 
+    if (tipo === "imagenes.optimizar") {
+      // Evento administrativo interno para recomprimir en lotes las imágenes ya guardadas a WebP.
+      const r = await db.optimizarImagenesExistentes(30)
+      if (r.procesadas > 0) regenerarPortal()
+      return json({ ok: true, ...r })
+    }
+
     if (tipo === "noticia.publicada" || tipo === "noticia.actualizada") {
       const motivo = validarNoticia(evento.noticia)
       if (motivo) {
@@ -84,6 +91,7 @@ export async function POST(req: Request) {
           after(async () => {
             try {
               await db.copiarImagen(noticia.id, noticia.version, imagen)
+              await db.optimizarImagenesExistentes(5).catch(() => {})
               regenerarPortal()
             } catch (e) {
               console.error("[webhook] no se pudo copiar la imagen; se sigue usando la del motor", noticia.id, e)

@@ -209,6 +209,10 @@ export function almacenLocal(): Almacen {
 
     async copiarImagen() {},
 
+    async optimizarImagenesExistentes() {
+      return { procesadas: 0, pendientes: 0, ahorradoBytes: 0 }
+    },
+
     async guardarPortada(id, portada) {
       const e = await leer()
       const n = e.noticias.find((x) => x.id === id)
@@ -245,6 +249,7 @@ export function almacenVacio(): Almacen {
     retirarNoticia: sinDb,
     registrarVista: async () => {},
     copiarImagen: async () => {},
+    optimizarImagenesExistentes: async () => ({ procesadas: 0, pendientes: 0, ahorradoBytes: 0 }),
     guardarPortada: sinDb,
     portadas: async () => [],
   }
