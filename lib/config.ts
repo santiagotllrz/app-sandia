@@ -16,7 +16,7 @@ export const sitio = {
   climaPorDefecto: { ciudad: "Bogotá", lat: 4.711, lon: -74.0721 },
   // A dónde lleva el botón de alertas de la página de enlaces (NEXT_PUBLIC_ALERTAS_URL lo cambia).
   alertasUrl: process.env.NEXT_PUBLIC_ALERTAS_URL || "https://usesandia.com",
-  contacto: process.env.NEXT_PUBLIC_CONTACTO_EMAIL || "contacto@usesandia.com",
+  contacto: process.env.NEXT_PUBLIC_CONTACTO_EMAIL || "contacto@indiceagro.co",
   redes: {
     instagram: "https://www.instagram.com/indiceagro.co",
     facebook: "https://www.facebook.com/indiceagro/",
